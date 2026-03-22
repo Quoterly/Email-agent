@@ -1,6 +1,23 @@
+let dailyCount = 0;
+let lastReset = new Date().toDateString();
+
+const DAILY_LIMIT = 25;
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const today = new Date().toDateString();
+  if (today !== lastReset) {
+    dailyCount = 0;
+    lastReset = today;
+  }
+
+  if (dailyCount >= DAILY_LIMIT) {
+    return res.status(429).json({
+      error: `Denní limit ${DAILY_LIMIT} vygenerování byl vyčerpán. Zkuste to zítra.`
+    });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -25,6 +42,8 @@ export default async function handler(req, res) {
       return res.status(response.status).json(data);
     }
 
+    dailyCount++;
+    res.setHeader('X-Daily-Remaining', DAILY_LIMIT - dailyCount);
     return res.status(200).json(data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
