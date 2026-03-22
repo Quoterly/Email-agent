@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Agent Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e2e0d8;
+    --border2: #cccac0;
+    --text: #1a1a18;
+    --text2: #6b6a64;
+    --text3: #9e9d97;
+    --accent: #2a5caa;
+    --accent-bg: #eef3fb;
+    --accent-text: #1d4280;
+    --success-bg: #edf7f1;
+    --success-text: #1a6b3c;
+    --warn-bg: #fef8ec;
+    --warn-text: #8a6200;
+    --danger-bg: #fdf0ef;
+    --danger-text: #b83232;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 0.25rem;
+  }
+
+  header h1 { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
+  header span { font-size: 13px; color: var(--text3); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 1rem;
+  }
+
+  .fields { display: flex; flex-direction: column; gap: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; color: var(--text2); font-weight: 500; }
+
+  input[type=text], textarea, select {
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 8px 10px;
+    width: 100%;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+
+  textarea { resize: vertical; line-height: 1.6; }
+  select { cursor: pointer; }
+
+  .tone-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .tone-btn {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tone-btn.active {
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    border-color: var(--accent);
+  }
+
+  .examples {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    align-items: center;
+  }
+
+  .ex-label { font-size: 12px; color: var(--text3); }
+
+  .ex-btn {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .ex-btn:hover { background: var(--surface2); }
+
+  .actions { display: flex; justify-content: flex-end; }
+
+  .run-btn {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 28px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .run-btn:hover { opacity: 0.88; }
+  .run-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .response-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    display: none;
+  }
+  .response-card.visible { display: block; }
+
+  .response-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
+  .badge.ok { background: var(--success-bg); color: var(--success-text); }
+  .badge.loading { background: var(--warn-bg); color: var(--warn-text); }
+  .badge.error { background: var(--danger-bg); color: var(--danger-text); }
+
+  .copy-btn {
+    font-size: 12px;
+    padding: 4px 12px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: var(--surface2); }
+  .copy-btn.copied { color: var(--success-text); border-color: var(--success-text); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+  .reply-text {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    min-height: 48px;
+  }
+
+  @media (max-width: 520px) {
+    .grid2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Email Agent</h1>
+    <span>demo konfigurace</span>
+  </header>
+
+  <div class="card">
+    <div class="card-label">Konfigurace firmy</div>
+    <div class="fields">
+      <div class="grid2">
+        <div class="field">
+          <label>Název firmy</label>
+          <input type="text" id="company-name" value="Elektro Novák" />
+        </div>
+        <div class="field">
+          <label>Obor</label>
+          <select id="industry">
+            <option>E-shop s elektronikou</option>
+            <option>Módní e-shop</option>
+            <option>Realitní kancelář</option>
+            <option>Účetní kancelář</option>
+            <option>Autoservis</option>
+            <option>Jiné</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Popis firmy</label>
+        <textarea id="company-desc" rows="2">Jsme rodinný e-shop s elektronikou. Prodáváme spotřebiče, mobily a příslušenství. Doručujeme do 2 pracovních dnů, vrácení zboží do 30 dnů.</textarea>
+      </div>
+      <div class="field">
+        <label>Tón komunikace</label>
+        <div class="tone-grid">
+          <button class="tone-btn active" data-tone="přátelský a profesionální">přátelský</button>
+          <button class="tone-btn" data-tone="formální a věcný">formální</button>
+          <button class="tone-btn" data-tone="neformální a lidský">neformální</button>
+          <button class="tone-btn" data-tone="stručný a přímočarý">stručný</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Podpis</label>
+        <input type="text" id="signature" value="Tým zákaznické podpory, Elektro Novák" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Příchozí e-mail</div>
+    <div class="fields">
+      <div class="field">
+        <label>Předmět</label>
+        <input type="text" id="email-subject" value="Dotaz na objednávku #4821" />
+      </div>
+      <div class="field">
+        <label>Text e-mailu</label>
+        <textarea id="email-body" rows="4">Dobrý den, chtěl bych se zeptat, kde je moje objednávka č. 4821. Objednal jsem si mobil před 5 dny a stále nic. Můžete mi sdělit, co se děje?</textarea>
+      </div>
+      <div class="examples">
+        <span class="ex-label">Příklady:</span>
+        <button class="ex-btn" onclick="loadExample('reklamace')">reklamace</button>
+        <button class="ex-btn" onclick="loadExample('vraceni')">vrácení zboží</button>
+        <button class="ex-btn" onclick="loadExample('dotaz')">dotaz na produkt</button>
+        <button class="ex-btn" onclick="loadExample('negativni')">negativní zpětná vazba</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="run-btn" id="run-btn" onclick="generateReply()">
+      <span id="btn-icon">→</span>
+      <span id="btn-text">Vygenerovat odpověď</span>
+    </button>
+  </div>
+
+  <div class="response-card" id="response-card">
+    <div class="response-header">
+      <div class="card-label" style="margin-bottom:0;">Navrhovaná odpověď</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="badge loading" id="status-badge">generuji...</span>
+        <button class="copy-btn" id="copy-btn" onclick="copyReply()">kopírovat</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="reply-text" id="reply-text"></div>
+  </div>
+
+</div>
+
+<script>
+let selectedTone = 'přátelský a profesionální';
+
+document.querySelectorAll('.tone-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTone = btn.dataset.tone;
+  });
+});
+
+const examples = {
+  reklamace: {
+    subject: 'Reklamace televize LG 55"',
+    body: 'Dobrý den, zakoupil jsem u vás televizi LG 55" před 3 měsíci a nyní se na obrazovce objevily černé pruhy. Chci uplatnit reklamaci. Jak mám postupovat? Máte pobočku v Praze?'
+  },
+  vraceni: {
+    subject: 'Vrácení zboží – objednávka #3304',
+    body: 'Ahoj, koupila jsem si u vás robotický vysavač ale nesedí mi do bytu, je moc hlučný. Chtěla bych ho vrátit a dostat peníze zpět. Co k tomu potřebujete?'
+  },
+  dotaz: {
+    subject: 'Dotaz - kompatibilita příslušenství',
+    body: 'Dobrý den, zajímá mě jestli kryt na iPhone 15 Pro který prodáváte sedí i na iPhone 15 Pro Max? Děkuji za odpověď.'
+  },
+  negativni: {
+    subject: 'Velmi nespokojený zákazník!!!',
+    body: 'To je skandál! Objednal jsem si notebook před 10 dny, nikdo mi nic neřekl o zpoždění a na zákaznickou linku se nedovolám. Tohle je naprostý neprofesionalizmus. Budu psát recenzi na Heurece!'
+  }
+};
+
+function loadExample(key) {
+  const ex = examples[key];
+  document.getElementById('email-subject').value = ex.subject;
+  document.getElementById('email-body').value = ex.body;
+}
+
+async function generateReply() {
+  const btn = document.getElementById('run-btn');
+  const btnText = document.getElementById('btn-text');
+  const btnIcon = document.getElementById('btn-icon');
+  const card = document.getElementById('response-card');
+  const replyText = document.getElementById('reply-text');
+  const badge = document.getElementById('status-badge');
+  const copyBtn = document.getElementById('copy-btn');
+
+  const companyName = document.getElementById('company-name').value;
+  const industry = document.getElementById('industry').value;
+  const companyDesc = document.getElementById('company-desc').value;
+  const signature = document.getElementById('signature').value;
+  const subject = document.getElementById('email-subject').value;
+  const body = document.getElementById('email-body').value;
+
+  btn.disabled = true;
+  btnText.textContent = 'Generuji...';
+  btnIcon.textContent = '⟳';
+  card.classList.add('visible');
+  badge.textContent = 'generuji...';
+  badge.className = 'badge loading';
+  replyText.textContent = '';
+  copyBtn.textContent = 'kopírovat';
+  copyBtn.className = 'copy-btn';
+
+  const systemPrompt = `Jsi AI asistent zákaznické podpory pro firmu "${companyName}" (${industry}).
+
+O firmě: ${companyDesc}
+
+Pravidla odpovídání:
+- Tón: ${selectedTone}
+- Vždy piš česky
+- Buď konkrétní a nápomocný
+- Pokud nevíš přesnou informaci (stav objednávky apod.), nabídni prověření nebo kontakt
+- Ukončuj e-mail podpisem: "${signature}"
+- Piš pouze text odpovědi, bez předmětu a bez komentáře`;
+
+  const userPrompt = `Příchozí e-mail od zákazníka:
+Předmět: ${subject}
+
+${body}
+
+Napiš zdvořilou odpověď.`;
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'HTTP ' + response.status);
+    }
+
+    const data = await response.json();
+    const text = data.content?.map(b => b.text || '').join('') || 'Prázdná odpověď.';
+    replyText.textContent = text;
+    badge.textContent = 'hotovo';
+    badge.className = 'badge ok';
+  } catch (e) {
+    replyText.textContent = 'Chyba: ' + e.message;
+    badge.textContent = 'chyba';
+    badge.className = 'badge error';
+  }
+
+  btn.disabled = false;
+  btnText.textContent = 'Vygenerovat znovu';
+  btnIcon.textContent = '→';
+}
+
+function copyReply() {
+  const text = document.getElementById('reply-text').textContent;
+  const btn = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'zkopírováno ✓';
+    btn.className = 'copy-btn copied';
+    setTimeout(() => {
+      btn.textContent = 'kopírovat';
+      btn.className = 'copy-btn';
+    }, 2000);
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
