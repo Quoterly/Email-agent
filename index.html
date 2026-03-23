@@ -1,227 +1,358 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="cs" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Email Agent Demo</title>
+<title>Email Agent</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --surface2: #f0efe9;
-    --border: #e2e0d8;
-    --border2: #cccac0;
-    --text: #1a1a18;
-    --text2: #6b6a64;
-    --text3: #9e9d97;
-    --accent: #2a5caa;
-    --accent-bg: #eef3fb;
-    --accent-text: #1d4280;
-    --success-bg: #edf7f1;
-    --success-text: #1a6b3c;
-    --warn-bg: #fef8ec;
-    --warn-text: #8a6200;
-    --danger-bg: #fdf0ef;
-    --danger-text: #b83232;
-    --radius: 10px;
-    --radius-sm: 6px;
-  }
+[data-theme="light"] {
+  --bg: #f2f1ed;
+  --surface: #ffffff;
+  --surface2: #f7f6f3;
+  --surface3: #eeecea;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.15);
+  --text: #141413;
+  --text2: #5c5b56;
+  --text3: #9a9891;
+  --accent: #1a56a4;
+  --accent-light: #e8f0fb;
+  --accent-text: #1a56a4;
+  --success-bg: #e8f5ee;
+  --success-text: #186636;
+  --warn-bg: #fef7e8;
+  --warn-text: #7a5800;
+  --danger-bg: #fdeeed;
+  --danger-text: #b02c2c;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04);
+}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
+[data-theme="dark"] {
+  --bg: #111110;
+  --surface: #1c1c1a;
+  --surface2: #242422;
+  --surface3: #2c2c29;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0efe9;
+  --text2: #9a9891;
+  --text3: #5c5b56;
+  --accent: #4d8de8;
+  --accent-light: #1a2a42;
+  --accent-text: #7aaff0;
+  --success-bg: #0f2a1a;
+  --success-text: #5cc98a;
+  --warn-bg: #261e08;
+  --warn-text: #f0bc4a;
+  --danger-bg: #2a1010;
+  --danger-text: #f08080;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03);
+}
 
-  .page {
-    max-width: 720px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+  transition: background 0.2s, color 0.2s;
+}
 
-  header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding-bottom: 0.25rem;
-  }
+.page { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
 
-  header h1 { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
-  header span { font-size: 13px; color: var(--text3); }
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+  margin-bottom: 0.5rem;
+}
 
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-  }
+.logo { display: flex; align-items: center; gap: 10px; }
 
-  .card-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-    margin-bottom: 1rem;
-  }
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
 
-  .fields { display: flex; flex-direction: column; gap: 14px; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 12px; color: var(--text2); font-weight: 500; }
+.logo-icon svg { width: 16px; height: 16px; }
 
-  input[type=text], textarea, select {
-    font-family: inherit;
-    font-size: 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    padding: 8px 10px;
-    width: 100%;
-    transition: border-color 0.15s;
-    outline: none;
-  }
+.logo h1 { font-size: 17px; font-weight: 500; letter-spacing: -0.02em; }
+.logo span { font-size: 12px; color: var(--text3); margin-left: 4px; }
 
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--accent);
-    background: var(--surface);
-  }
+.theme-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+.theme-btn:hover { background: var(--surface3); }
+.theme-btn svg { width: 16px; height: 16px; }
 
-  textarea { resize: vertical; line-height: 1.6; }
-  select { cursor: pointer; }
+.card {
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
 
-  .tone-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.card-header {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .tone-btn {
-    font-family: inherit;
-    font-size: 13px;
-    padding: 5px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border2);
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+.card-header-icon {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--surface3);
+  display: flex; align-items: center; justify-content: center;
+}
+.card-header-icon svg { width: 12px; height: 12px; color: var(--text2); }
 
-  .tone-btn.active {
-    background: var(--accent-bg);
-    color: var(--accent-text);
-    border-color: var(--accent);
-  }
+.card-title { font-size: 12px; font-weight: 500; color: var(--text2); letter-spacing: 0.03em; }
 
-  .examples {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    align-items: center;
-  }
+.card-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
 
-  .ex-label { font-size: 12px; color: var(--text3); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-  .ex-btn {
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.15s;
-  }
-  .ex-btn:hover { background: var(--surface2); }
+.field { display: flex; flex-direction: column; gap: 5px; }
 
-  .actions { display: flex; justify-content: flex-end; }
+.field label { font-size: 12px; font-weight: 500; color: var(--text2); }
 
-  .run-btn {
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 10px 28px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--accent);
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+input[type=text], textarea, select {
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 8px 11px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-appearance: none;
+}
 
-  .run-btn:hover { opacity: 0.88; }
-  .run-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+input[type=text]:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+}
 
-  .response-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    display: none;
-  }
-  .response-card.visible { display: block; }
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
 
-  .response-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
+textarea { resize: vertical; line-height: 1.6; }
 
-  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
-  .badge.ok { background: var(--success-bg); color: var(--success-text); }
-  .badge.loading { background: var(--warn-bg); color: var(--warn-text); }
-  .badge.error { background: var(--danger-bg); color: var(--danger-text); }
+.tone-grid { display: flex; gap: 6px; flex-wrap: wrap; }
 
-  .copy-btn {
-    font-size: 12px;
-    padding: 4px 12px;
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.15s;
-  }
-  .copy-btn:hover { background: var(--surface2); }
-  .copy-btn.copied { color: var(--success-text); border-color: var(--success-text); }
+.tone-btn {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 400;
+}
 
-  .divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.tone-btn:hover { border-color: var(--accent); color: var(--accent-text); }
 
-  .reply-text {
-    font-size: 14px;
-    line-height: 1.75;
-    color: var(--text);
-    white-space: pre-wrap;
-    min-height: 48px;
-  }
+.tone-btn.active {
+  background: var(--accent-light);
+  color: var(--accent-text);
+  border-color: var(--accent);
+  font-weight: 500;
+}
 
-  @media (max-width: 520px) {
-    .grid2 { grid-template-columns: 1fr; }
-  }
+.examples { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+.ex-label { font-size: 11px; color: var(--text3); }
+
+.ex-btn {
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.ex-btn:hover { background: var(--surface3); color: var(--text); }
+
+.run-wrap {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 2px;
+}
+
+.run-btn {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.run-btn:hover { opacity: 0.9; }
+.run-btn:active { transform: scale(0.98); }
+.run-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.run-btn.loading .spinner { display: block; }
+.run-btn.loading .arrow { display: none; }
+
+.response-card { display: none; }
+.response-card.visible { display: block; }
+
+.response-header {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.response-header-left { display: flex; align-items: center; gap: 8px; }
+
+.badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+.badge.ok { background: var(--success-bg); color: var(--success-text); }
+.badge.loading { background: var(--warn-bg); color: var(--warn-text); }
+.badge.error { background: var(--danger-bg); color: var(--danger-text); }
+
+.copy-btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.copy-btn:hover { background: var(--surface3); }
+.copy-btn.copied { color: var(--success-text); border-color: var(--success-text); }
+.copy-btn svg { width: 12px; height: 12px; }
+
+.reply-text {
+  padding: 18px 20px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  min-height: 60px;
+}
+
+.counter {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.counter-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--success-text);
+  opacity: 0.7;
+}
+
+@media (max-width: 500px) {
+  .grid2 { grid-template-columns: 1fr; }
+  body { padding: 1.25rem 0.75rem 3rem; }
+}
 </style>
 </head>
 <body>
 <div class="page">
 
-  <header>
-    <h1>Email Agent</h1>
-    <span>demo konfigurace</span>
-  </header>
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="14" height="10" rx="2"/>
+          <path d="M1 6l7 4 7-4"/>
+        </svg>
+      </div>
+      <h1>Email Agent <span>demo</span></h1>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()" title="Přepnout režim">
+      <svg id="theme-icon-light" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <circle cx="8" cy="8" r="3"/>
+        <line x1="8" y1="1" x2="8" y2="2.5"/>
+        <line x1="8" y1="13.5" x2="8" y2="15"/>
+        <line x1="1" y1="8" x2="2.5" y2="8"/>
+        <line x1="13.5" y1="8" x2="15" y2="8"/>
+        <line x1="3" y1="3" x2="4.1" y2="4.1"/>
+        <line x1="11.9" y1="11.9" x2="13" y2="13"/>
+        <line x1="13" y1="3" x2="11.9" y2="4.1"/>
+        <line x1="4.1" y1="11.9" x2="3" y2="13"/>
+      </svg>
+      <svg id="theme-icon-dark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none">
+        <path d="M13.5 10.5A6 6 0 015.5 2.5a6 6 0 108 8z"/>
+      </svg>
+    </button>
+  </div>
 
   <div class="card">
-    <div class="card-label">Konfigurace firmy</div>
-    <div class="fields">
+    <div class="card-header">
+      <div class="card-header-icon">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="1" y="2" width="10" height="8" rx="1.5"/>
+          <path d="M1 4l5 3 5-3"/>
+        </svg>
+      </div>
+      <span class="card-title">Konfigurace firmy</span>
+    </div>
+    <div class="card-body">
       <div class="grid2">
         <div class="field">
           <label>Název firmy</label>
@@ -307,8 +438,16 @@
   </div>
 
   <div class="card">
-    <div class="card-label">Příchozí e-mail</div>
-    <div class="fields">
+    <div class="card-header">
+      <div class="card-header-icon">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1 1h10v8H1z" rx="1"/>
+          <path d="M3 4h6M3 6h4"/>
+        </svg>
+      </div>
+      <span class="card-title">Příchozí e-mail</span>
+    </div>
+    <div class="card-body">
       <div class="field">
         <label>Předmět</label>
         <input type="text" id="email-subject" value="Dotaz na objednávku #4821" />
@@ -327,29 +466,43 @@
     </div>
   </div>
 
-  <div class="actions">
+  <div class="run-wrap">
     <button class="run-btn" id="run-btn" onclick="generateReply()">
-      <span id="btn-icon">→</span>
+      <div class="spinner"></div>
+      <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 7h10M8 3l4 4-4 4"/>
+      </svg>
       <span id="btn-text">Vygenerovat odpověď</span>
     </button>
   </div>
 
-  <div class="response-card" id="response-card">
+  <div class="card response-card" id="response-card">
     <div class="response-header">
-      <div class="card-label" style="margin-bottom:0;">Navrhovaná odpověď</div>
-      <div style="display:flex;gap:8px;align-items:center;">
+      <div class="response-header-left">
+        <span class="card-title">Navrhovaná odpověď</span>
         <span class="badge loading" id="status-badge">generuji...</span>
-        <button class="copy-btn" id="copy-btn" onclick="copyReply()">kopírovat</button>
       </div>
+      <button class="copy-btn" id="copy-btn" onclick="copyReply()">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="4" y="4" width="7" height="7" rx="1.5"/>
+          <path d="M8 4V2.5A1.5 1.5 0 006.5 1H2.5A1.5 1.5 0 001 2.5v4A1.5 1.5 0 002.5 8H4"/>
+        </svg>
+        kopírovat
+      </button>
     </div>
-    <div class="divider"></div>
     <div class="reply-text" id="reply-text"></div>
+    <div class="counter" id="counter" style="display:none">
+      <div class="counter-dot"></div>
+      <span id="counter-text"></span>
+    </div>
   </div>
 
 </div>
 
 <script>
 let selectedTone = 'přátelský a profesionální';
+let usageCount = parseInt(localStorage.getItem('ea_count') || '0');
+const DAILY_LIMIT = 25;
 
 document.querySelectorAll('.tone-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -359,23 +512,29 @@ document.querySelectorAll('.tone-btn').forEach(btn => {
   });
 });
 
-const examples = {
-  reklamace: {
-    subject: 'Reklamace televize LG 55"',
-    body: 'Dobrý den, zakoupil jsem u vás televizi LG 55" před 3 měsíci a nyní se na obrazovce objevily černé pruhy. Chci uplatnit reklamaci. Jak mám postupovat? Máte pobočku v Praze?'
-  },
-  vraceni: {
-    subject: 'Vrácení zboží – objednávka #3304',
-    body: 'Ahoj, koupila jsem si u vás robotický vysavač ale nesedí mi do bytu, je moc hlučný. Chtěla bych ho vrátit a dostat peníze zpět. Co k tomu potřebujete?'
-  },
-  dotaz: {
-    subject: 'Dotaz - kompatibilita příslušenství',
-    body: 'Dobrý den, zajímá mě jestli kryt na iPhone 15 Pro který prodáváte sedí i na iPhone 15 Pro Max? Děkuji za odpověď.'
-  },
-  negativni: {
-    subject: 'Velmi nespokojený zákazník!!!',
-    body: 'To je skandál! Objednal jsem si notebook před 10 dny, nikdo mi nic neřekl o zpoždění a na zákaznickou linku se nedovolám. Tohle je naprostý neprofesionalizmus. Budu psát recenzi na Heurece!'
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-icon-light').style.display = isDark ? 'block' : 'none';
+  document.getElementById('theme-icon-dark').style.display = isDark ? 'none' : 'block';
+  localStorage.setItem('ea_theme', isDark ? 'light' : 'dark');
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('ea_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-icon-light').style.display = 'none';
+    document.getElementById('theme-icon-dark').style.display = 'block';
   }
+})();
+
+const examples = {
+  reklamace: { subject: 'Reklamace televize LG 55"', body: 'Dobrý den, zakoupil jsem u vás televizi LG 55" před 3 měsíci a nyní se na obrazovce objevily černé pruhy. Chci uplatnit reklamaci. Jak mám postupovat? Máte pobočku v Praze?' },
+  vraceni: { subject: 'Vrácení zboží – objednávka #3304', body: 'Ahoj, koupila jsem si u vás robotický vysavač ale nesedí mi do bytu, je moc hlučný. Chtěla bych ho vrátit a dostat peníze zpět. Co k tomu potřebujete?' },
+  dotaz: { subject: 'Dotaz - kompatibilita příslušenství', body: 'Dobrý den, zajímá mě jestli kryt na iPhone 15 Pro který prodáváte sedí i na iPhone 15 Pro Max? Děkuji za odpověď.' },
+  negativni: { subject: 'Velmi nespokojený zákazník!!!', body: 'To je skandál! Objednal jsem si notebook před 10 dny, nikdo mi nic neřekl o zpoždění a na zákaznickou linku se nedovolám. Tohle je naprostý neprofesionalizmus. Budu psát recenzi na Heurece!' }
 };
 
 function loadExample(key) {
@@ -387,11 +546,12 @@ function loadExample(key) {
 async function generateReply() {
   const btn = document.getElementById('run-btn');
   const btnText = document.getElementById('btn-text');
-  const btnIcon = document.getElementById('btn-icon');
   const card = document.getElementById('response-card');
   const replyText = document.getElementById('reply-text');
   const badge = document.getElementById('status-badge');
   const copyBtn = document.getElementById('copy-btn');
+  const counter = document.getElementById('counter');
+  const counterText = document.getElementById('counter-text');
 
   const companyName = document.getElementById('company-name').value;
   const industry = document.getElementById('industry').value;
@@ -401,14 +561,15 @@ async function generateReply() {
   const body = document.getElementById('email-body').value;
 
   btn.disabled = true;
+  btn.classList.add('loading');
   btnText.textContent = 'Generuji...';
-  btnIcon.textContent = '⟳';
   card.classList.add('visible');
   badge.textContent = 'generuji...';
   badge.className = 'badge loading';
   replyText.textContent = '';
   copyBtn.textContent = 'kopírovat';
   copyBtn.className = 'copy-btn';
+  counter.style.display = 'none';
 
   const systemPrompt = `Jsi AI asistent zákaznické podpory pro firmu "${companyName}" (${industry}).
 
@@ -422,19 +583,14 @@ Pravidla odpovídání:
 - Ukončuj e-mail podpisem: "${signature}"
 - Piš pouze text odpovědi, bez předmětu a bez komentáře`;
 
-  const userPrompt = `Příchozí e-mail od zákazníka:
-Předmět: ${subject}
-
-${body}
-
-Napiš zdvořilou odpověď.`;
+  const userPrompt = `Příchozí e-mail od zákazníka:\nPředmět: ${subject}\n\n${body}\n\nNapiš zdvořilou odpověď.`;
 
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }]
@@ -443,7 +599,7 @@ Napiš zdvořilou odpověď.`;
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || 'HTTP ' + response.status);
+      throw new Error(err.error?.message || err.error || 'HTTP ' + response.status);
     }
 
     const data = await response.json();
@@ -451,6 +607,12 @@ Napiš zdvořilou odpověď.`;
     replyText.textContent = text;
     badge.textContent = 'hotovo';
     badge.className = 'badge ok';
+
+    usageCount++;
+    const remaining = DAILY_LIMIT - usageCount;
+    counter.style.display = 'flex';
+    counterText.textContent = `Dnešní využití: ${usageCount} / ${DAILY_LIMIT} — zbývá ${remaining} vygenerování`;
+
   } catch (e) {
     replyText.textContent = 'Chyba: ' + e.message;
     badge.textContent = 'chyba';
@@ -458,18 +620,18 @@ Napiš zdvořilou odpověď.`;
   }
 
   btn.disabled = false;
+  btn.classList.remove('loading');
   btnText.textContent = 'Vygenerovat znovu';
-  btnIcon.textContent = '→';
 }
 
 function copyReply() {
   const text = document.getElementById('reply-text').textContent;
   const btn = document.getElementById('copy-btn');
   navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'zkopírováno ✓';
+    btn.innerHTML = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M2 6l3 3 5-5"/></svg> zkopírováno`;
     btn.className = 'copy-btn copied';
     setTimeout(() => {
-      btn.textContent = 'kopírovat';
+      btn.innerHTML = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:12px;height:12px"><rect x="4" y="4" width="7" height="7" rx="1.5"/><path d="M8 4V2.5A1.5 1.5 0 006.5 1H2.5A1.5 1.5 0 001 2.5v4A1.5 1.5 0 002.5 8H4"/></svg> kopírovat`;
       btn.className = 'copy-btn';
     }, 2000);
   }).catch(() => {});
