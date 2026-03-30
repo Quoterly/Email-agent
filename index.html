@@ -309,6 +309,106 @@ textarea { resize: vertical; line-height: 1.6; }
   .grid2 { grid-template-columns: 1fr; }
   body { padding: 1.25rem 0.75rem 3rem; }
 }
+
+.advanced-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  text-align: left;
+  transition: background 0.15s;
+}
+.advanced-toggle:hover { background: var(--surface2); }
+.advanced-toggle svg { transition: transform 0.2s; flex-shrink: 0; }
+.advanced-toggle.open svg { transform: rotate(180deg); }
+.advanced-toggle span { flex: 1; }
+.advanced-toggle .adv-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface3);
+  color: var(--text3);
+  font-weight: 400;
+}
+
+.advanced-body {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+.advanced-body.open { display: flex; }
+
+.adv-section {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.adv-section:last-child { border-bottom: none; }
+
+.adv-section-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.faq-list { display: flex; flex-direction: column; gap: 8px; }
+
+.faq-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
+
+.faq-item input { font-size: 13px; padding: 7px 10px; }
+
+.faq-remove {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.faq-remove:hover { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-text); }
+
+.add-faq-btn {
+  align-self: flex-start;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: 1px dashed var(--border2);
+  background: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.add-faq-btn:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-light); }
+
+.adv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 </style>
 </head>
 <body>
@@ -435,6 +535,85 @@ textarea { resize: vertical; line-height: 1.6; }
         <input type="text" id="signature" value="Tým zákaznické podpory, Elektro Novák" />
       </div>
     </div>
+
+    <button class="advanced-toggle" id="adv-toggle" onclick="toggleAdvanced()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 4l4 4 4-4"/>
+      </svg>
+      <span>Rozšířené nastavení</span>
+      <span class="adv-badge">znalostní báze</span>
+    </button>
+
+    <div class="advanced-body" id="adv-body">
+
+      <div class="adv-section">
+        <div class="adv-section-title">Časté dotazy (FAQ)</div>
+        <p style="font-size:12px;color:var(--text3);margin-top:-4px;">Agent použije tyto odpovědi pokud zákazník položí podobnou otázku.</p>
+        <div class="faq-list" id="faq-list">
+          <div class="faq-item">
+            <input type="text" placeholder="Dotaz zákazníka..." value="Jak dlouho trvá doručení?" />
+            <input type="text" placeholder="Odpověď agenta..." value="Doručujeme do 2 pracovních dnů po ČR." />
+            <button class="faq-remove" onclick="removeFaq(this)" title="Odebrat">×</button>
+          </div>
+          <div class="faq-item">
+            <input type="text" placeholder="Dotaz zákazníka..." value="Jak reklamovat zboží?" />
+            <input type="text" placeholder="Odpověď agenta..." value="Reklamaci vyřídíte přes náš web nebo osobně na prodejně. Zákonná záruka je 24 měsíců." />
+            <button class="faq-remove" onclick="removeFaq(this)" title="Odebrat">×</button>
+          </div>
+        </div>
+        <button class="add-faq-btn" onclick="addFaq()">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5.5" y1="1" x2="5.5" y2="10"/><line x1="1" y1="5.5" x2="10" y2="5.5"/></svg>
+          Přidat dotaz
+        </button>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-title">Eskalace</div>
+        <div class="adv-row">
+          <div class="field">
+            <label>Eskalační kontakt</label>
+            <input type="text" id="escalation-contact" placeholder="podpora@firma.cz nebo +420 xxx xxx xxx" />
+          </div>
+          <div class="field">
+            <label>Kdy eskalovat</label>
+            <input type="text" id="escalation-when" placeholder="Složité reklamace, právní hrozby..." />
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text3);">Agent zákazníka přesměruje na tento kontakt v situacích, kde nestačí automatická odpověď.</p>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-title">Zakázaná témata</div>
+        <div class="field">
+          <label>Agent nikdy nekomentuje</label>
+          <input type="text" id="forbidden-topics" placeholder="Ceny konkurence, interní procesy, probíhající soudní spory..." />
+        </div>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-title">Styl oslovení</div>
+        <div class="adv-row">
+          <div class="field">
+            <label>Oslovení zákazníka</label>
+            <select id="salutation">
+              <option value="vykani">Vykání (Dobrý den, děkujeme Vám...)</option>
+              <option value="tykani">Tykání (Ahoj, díky...)</option>
+              <option value="jmeno">Jménem pokud známo</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Délka odpovědi</label>
+            <select id="reply-length">
+              <option value="stredni">Střední — výstižná a přehledná</option>
+              <option value="kratka">Krátká — jen to nejdůležitější</option>
+              <option value="dlouha">Podrobná — s vysvětlením a možnostmi</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
   <div class="card">
@@ -571,17 +750,54 @@ async function generateReply() {
   copyBtn.className = 'copy-btn';
   counter.style.display = 'none';
 
+  // Collect FAQ
+  const faqItems = document.querySelectorAll('#faq-list .faq-item');
+  const faqs = [];
+  faqItems.forEach(item => {
+    const inputs = item.querySelectorAll('input');
+    const q = inputs[0]?.value.trim();
+    const a = inputs[1]?.value.trim();
+    if (q && a) faqs.push({ q, a });
+  });
+
+  const escalationContact = document.getElementById('escalation-contact').value.trim();
+  const escalationWhen = document.getElementById('escalation-when').value.trim();
+  const forbiddenTopics = document.getElementById('forbidden-topics').value.trim();
+  const salutation = document.getElementById('salutation').value;
+  const replyLength = document.getElementById('reply-length').value;
+
+  const salutationMap = { vykani: 'Vyká zákazníkům (Dobrý den, děkujeme Vám...)', tykani: 'Tyká zákazníkům (Ahoj, díky...)', jmeno: 'Oslovuje zákazníky jménem pokud je zná' };
+  const lengthMap = { stredni: 'střední délka — výstižná a přehledná', kratka: 'krátká — jen nejdůležitější informace', dlouha: 'podrobná — s vysvětlením a možnostmi' };
+
+  let faqSection = '';
+  if (faqs.length > 0) {
+    faqSection = '\n\nČASTO KLADENÉ DOTAZY (použij tyto odpovědi pokud zákazník klade podobnou otázku):\n' +
+      faqs.map((f, i) => `Q${i+1}: ${f.q}\nA${i+1}: ${f.a}`).join('\n');
+  }
+
+  let escalationSection = '';
+  if (escalationContact) {
+    escalationSection = `\n\nESKALACE: Pokud ${escalationWhen || 'zákazník má složitý problém který nedokážeš vyřešit'}, přesměruj ho na: ${escalationContact}`;
+  }
+
+  let forbiddenSection = '';
+  if (forbiddenTopics) {
+    forbiddenSection = `\n\nZAKÁZANÁ TÉMATA — nikdy nekomentuj: ${forbiddenTopics}`;
+  }
+
   const systemPrompt = `Jsi AI asistent zákaznické podpory pro firmu "${companyName}" (${industry}).
 
 O firmě: ${companyDesc}
 
 Pravidla odpovídání:
 - Tón: ${selectedTone}
+- Oslovení: ${salutationMap[salutation]}
+- Délka odpovědi: ${lengthMap[replyLength]}
 - Vždy piš česky
 - Buď konkrétní a nápomocný
-- Pokud nevíš přesnou informaci (stav objednávky apod.), nabídni prověření nebo kontakt
+- Pokud nevíš přesnou informaci, nabídni prověření nebo kontakt
 - Ukončuj e-mail podpisem: "${signature}"
-- Piš pouze text odpovědi, bez předmětu a bez komentáře`;
+- Piš pouze text odpovědi, bez předmětu a bez komentáře${faqSection}${escalationSection}${forbiddenSection}`;
 
   const userPrompt = `Příchozí e-mail od zákazníka:\nPředmět: ${subject}\n\n${body}\n\nNapiš zdvořilou odpověď.`;
 
@@ -622,6 +838,30 @@ Pravidla odpovídání:
   btn.disabled = false;
   btn.classList.remove('loading');
   btnText.textContent = 'Vygenerovat znovu';
+}
+
+function toggleAdvanced() {
+  const toggle = document.getElementById('adv-toggle');
+  const body = document.getElementById('adv-body');
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function addFaq() {
+  const list = document.getElementById('faq-list');
+  const item = document.createElement('div');
+  item.className = 'faq-item';
+  item.innerHTML = `
+    <input type="text" placeholder="Dotaz zákazníka..." />
+    <input type="text" placeholder="Odpověď agenta..." />
+    <button class="faq-remove" onclick="removeFaq(this)" title="Odebrat">×</button>
+  `;
+  list.appendChild(item);
+  item.querySelector('input').focus();
+}
+
+function removeFaq(btn) {
+  btn.closest('.faq-item').remove();
 }
 
 function copyReply() {
