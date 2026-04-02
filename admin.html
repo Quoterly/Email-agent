@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="cs" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Agent — Schvalování</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+[data-theme="light"] {
+  --bg: #f2f1ed; --surface: #fff; --surface2: #f7f6f3; --surface3: #eeecea;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
+  --text: #141413; --text2: #5c5b56; --text3: #9a9891;
+  --accent: #1a56a4; --accent-light: #e8f0fb; --accent-text: #1a56a4;
+  --green: #186636; --green-bg: #e8f5ee;
+  --warn-bg: #fef7e8; --warn-text: #7a5800;
+  --danger-bg: #fdeeed; --danger-text: #b02c2c;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] {
+  --bg: #111110; --surface: #1c1c1a; --surface2: #242422; --surface3: #2c2c29;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14);
+  --text: #f0efe9; --text2: #9a9891; --text3: #5c5b56;
+  --accent: #4d8de8; --accent-light: #1a2a42; --accent-text: #7aaff0;
+  --green: #5cc98a; --green-bg: #0f2a1a;
+  --warn-bg: #261e08; --warn-text: #f0bc4a;
+  --danger-bg: #2a1010; --danger-text: #f08080;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; padding: 2rem 1rem 4rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.page { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2px; margin-bottom: 0.5rem;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-icon svg { width: 16px; height: 16px; }
+.logo h1 { font-size: 17px; font-weight: 500; letter-spacing: -0.02em; }
+.logo span { font-size: 12px; color: var(--text3); margin-left: 4px; }
+
+.topbar-right { display: flex; gap: 8px; align-items: center; }
+
+.btn-sm {
+  font-size: 12px; padding: 6px 14px; border-radius: 7px;
+  border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text2); cursor: pointer; font-family: inherit;
+  transition: all 0.15s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn-sm:hover { background: var(--surface3); }
+
+.theme-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  border: 1px solid var(--border2); background: var(--surface);
+  color: var(--text2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; box-shadow: var(--shadow);
+}
+.theme-btn:hover { background: var(--surface3); }
+.theme-btn svg { width: 16px; height: 16px; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+
+.stat {
+  background: var(--surface); border-radius: 12px;
+  box-shadow: var(--shadow); padding: 14px 18px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.stat-val { font-size: 24px; font-weight: 500; letter-spacing: -0.02em; }
+.stat-label { font-size: 12px; color: var(--text3); }
+.stat-val.pending { color: var(--warn-text); }
+.stat-val.sent { color: var(--green); }
+
+.filters {
+  display: flex; gap: 6px; align-items: center;
+}
+
+.filter-btn {
+  font-size: 12px; padding: 5px 13px; border-radius: 999px;
+  border: 1px solid var(--border2); background: var(--surface2);
+  color: var(--text2); cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.filter-btn:hover { color: var(--text); }
+.filter-btn.active { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent); font-weight: 500; }
+
+.refresh-btn {
+  margin-left: auto; font-size: 12px; padding: 5px 13px;
+  border-radius: 7px; border: 1px solid var(--border2);
+  background: var(--surface); color: var(--text2);
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 5px;
+  transition: all 0.15s;
+}
+.refresh-btn:hover { background: var(--surface3); }
+.refresh-btn svg { width: 12px; height: 12px; }
+
+.email-list { display: flex; flex-direction: column; gap: 10px; }
+
+.email-card {
+  background: var(--surface); border-radius: 14px;
+  box-shadow: var(--shadow); overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+
+.email-card.sent { opacity: 0.6; }
+.email-card.ignored { opacity: 0.4; }
+
+.email-header {
+  padding: 14px 18px 12px;
+  display: flex; align-items: flex-start; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.email-header:hover { background: var(--surface2); }
+
+.email-from-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--accent-light); color: var(--accent-text);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; flex-shrink: 0;
+}
+
+.email-meta { flex: 1; min-width: 0; }
+.email-from { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.email-subject { font-size: 13px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.email-date { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+.status-badge {
+  font-size: 11px; font-weight: 500; padding: 3px 9px;
+  border-radius: 999px; flex-shrink: 0;
+}
+.status-badge.pending { background: var(--warn-bg); color: var(--warn-text); }
+.status-badge.sent { background: var(--green-bg); color: var(--green); }
+.status-badge.ignored { background: var(--surface3); color: var(--text3); }
+
+.email-body { display: none; }
+.email-body.open { display: block; }
+
+.email-section {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.email-section-title {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 8px;
+}
+
+.email-text {
+  font-size: 13px; line-height: 1.7; color: var(--text2);
+  white-space: pre-wrap; max-height: 120px; overflow-y: auto;
+}
+
+.reply-editor {
+  font-family: inherit; font-size: 14px; line-height: 1.7;
+  color: var(--text); background: var(--surface2);
+  border: 1px solid var(--border2); border-radius: 8px;
+  padding: 10px 12px; width: 100%; resize: vertical;
+  min-height: 120px; outline: none;
+  transition: border-color 0.15s;
+}
+.reply-editor:focus { border-color: var(--accent); background: var(--surface); }
+
+.email-actions {
+  padding: 12px 18px;
+  display: flex; gap: 8px; align-items: center;
+}
+
+.btn-send {
+  font-size: 13px; font-weight: 500; padding: 8px 20px;
+  border-radius: 8px; border: none;
+  background: var(--accent); color: #fff;
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.15s;
+}
+.btn-send:hover { opacity: 0.88; }
+.btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-ignore {
+  font-size: 13px; padding: 8px 16px;
+  border-radius: 8px; border: 1px solid var(--border2);
+  background: none; color: var(--text2);
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-ignore:hover { background: var(--surface3); }
+
+.send-status { font-size: 12px; color: var(--text3); margin-left: auto; }
+
+.empty-state {
+  text-align: center; padding: 4rem 2rem;
+  color: var(--text3); font-size: 14px;
+}
+.empty-state svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.4; }
+
+.loading-state { text-align: center; padding: 3rem; color: var(--text3); }
+
+@media (max-width: 500px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  body { padding: 1.25rem 0.75rem 3rem; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="14" height="10" rx="2"/>
+          <path d="M1 6l7 4 7-4"/>
+        </svg>
+      </div>
+      <h1>Email Agent <span>schvalování</span></h1>
+    </div>
+    <div class="topbar-right">
+      <a href="/" class="btn-sm">Demo konfigurátor</a>
+      <button class="theme-btn" onclick="toggleTheme()">
+        <svg id="theme-icon-light" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="8" cy="8" r="3"/>
+          <line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/>
+          <line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/>
+          <line x1="3" y1="3" x2="4.1" y2="4.1"/><line x1="11.9" y1="11.9" x2="13" y2="13"/>
+          <line x1="13" y1="3" x2="11.9" y2="4.1"/><line x1="4.1" y1="11.9" x2="3" y2="13"/>
+        </svg>
+        <svg id="theme-icon-dark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none">
+          <path d="M13.5 10.5A6 6 0 015.5 2.5a6 6 0 108 8z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="stat-total">—</div>
+      <div class="stat-label">Celkem e-mailů</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val pending" id="stat-pending">—</div>
+      <div class="stat-label">Čeká na schválení</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val sent" id="stat-sent">—</div>
+      <div class="stat-label">Odesláno</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">Vše</button>
+    <button class="filter-btn" onclick="setFilter('pending', this)">Čeká</button>
+    <button class="filter-btn" onclick="setFilter('sent', this)">Odesláno</button>
+    <button class="filter-btn" onclick="setFilter('ignored', this)">Ignorováno</button>
+    <button class="refresh-btn" onclick="loadEmails()">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 6A5 5 0 0010.5 9M11 6A5 5 0 001.5 3"/>
+        <path d="M9 9l1.5 0 0-1.5M3 3L1.5 3l0 1.5"/>
+      </svg>
+      Obnovit
+    </button>
+  </div>
+
+  <div id="email-list" class="email-list">
+    <div class="loading-state">Načítám e-maily...</div>
+  </div>
+
+</div>
+
+<script>
+let allEmails = [];
+let currentFilter = 'all';
+
+(function initTheme() {
+  const saved = localStorage.getItem('ea_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-icon-light').style.display = 'none';
+    document.getElementById('theme-icon-dark').style.display = 'block';
+  }
+})();
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-icon-light').style.display = isDark ? 'block' : 'none';
+  document.getElementById('theme-icon-dark').style.display = isDark ? 'none' : 'block';
+  localStorage.setItem('ea_theme', isDark ? 'light' : 'dark');
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderEmails();
+}
+
+function getInitials(from) {
+  const name = from.split('<')[0].trim() || from;
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 3600000) return `před ${Math.floor(diff/60000)} min`;
+  if (diff < 86400000) return `před ${Math.floor(diff/3600000)} hod`;
+  return d.toLocaleDateString('cs', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+function statusLabel(status) {
+  return { pending: 'čeká', sent: 'odesláno', ignored: 'ignorováno' }[status] || status;
+}
+
+async function loadEmails() {
+  const list = document.getElementById('email-list');
+  list.innerHTML = '<div class="loading-state">Načítám...</div>';
+  try {
+    const res = await fetch('/api/emails');
+    allEmails = await res.json();
+    updateStats();
+    renderEmails();
+  } catch (e) {
+    list.innerHTML = `<div class="loading-state">Chyba: ${e.message}</div>`;
+  }
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = allEmails.length;
+  document.getElementById('stat-pending').textContent = allEmails.filter(e => e.status === 'pending').length;
+  document.getElementById('stat-sent').textContent = allEmails.filter(e => e.status === 'sent').length;
+}
+
+function renderEmails() {
+  const list = document.getElementById('email-list');
+  const filtered = currentFilter === 'all' ? allEmails : allEmails.filter(e => e.status === currentFilter);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="4" y="8" width="32" height="24" rx="4"/>
+          <path d="M4 14l16 10 16-10"/>
+        </svg>
+        <div>Žádné e-maily</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(email => `
+    <div class="email-card ${email.status}" id="card-${email.id}">
+      <div class="email-header" onclick="toggleCard('${email.id}')">
+        <div class="email-from-avatar">${getInitials(email.from)}</div>
+        <div class="email-meta">
+          <div class="email-from">${escHtml(email.from)}</div>
+          <div class="email-subject">${escHtml(email.subject)}</div>
+          <div class="email-date">${formatDate(email.date)}</div>
+        </div>
+        <span class="status-badge ${email.status}">${statusLabel(email.status)}</span>
+      </div>
+      <div class="email-body" id="body-${email.id}">
+        <div class="email-section">
+          <div class="email-section-title">Příchozí zpráva</div>
+          <div class="email-text">${escHtml(email.body)}</div>
+        </div>
+        <div class="email-section">
+          <div class="email-section-title">Navrhovaná odpověď — upravte dle potřeby</div>
+          <textarea class="reply-editor" id="reply-${email.id}">${escHtml(email.reply)}</textarea>
+        </div>
+        <div class="email-actions">
+          ${email.status !== 'sent' ? `
+            <button class="btn-send" onclick="sendEmail('${email.id}')">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 1l11 5.5L1 12V8l7-1.5L1 5V1z"/>
+              </svg>
+              Odeslat odpověď
+            </button>
+            <button class="btn-ignore" onclick="ignoreEmail('${email.id}')">Ignorovat</button>
+          ` : '<span style="font-size:13px;color:var(--green)">✓ Odesláno ' + (email.sentAt ? formatDate(email.sentAt) : '') + '</span>'}
+          <span class="send-status" id="status-${email.id}"></span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCard(id) {
+  const body = document.getElementById(`body-${id}`);
+  body.classList.toggle('open');
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function sendEmail(id) {
+  const replyText = document.getElementById(`reply-${id}`).value;
+  const statusEl = document.getElementById(`status-${id}`);
+  const btn = document.querySelector(`#card-${id} .btn-send`);
+
+  btn.disabled = true;
+  statusEl.textContent = 'Odesílám...';
+
+  try {
+    const res = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emailId: id, replyText })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    statusEl.textContent = 'Odesláno!';
+    const email = allEmails.find(e => e.id === id);
+    if (email) { email.status = 'sent'; email.sentAt = new Date().toISOString(); }
+    updateStats();
+    setTimeout(() => renderEmails(), 1000);
+  } catch (e) {
+    statusEl.textContent = 'Chyba: ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+async function ignoreEmail(id) {
+  await fetch('/api/emails', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ emailId: id, status: 'ignored' })
+  });
+  const email = allEmails.find(e => e.id === id);
+  if (email) email.status = 'ignored';
+  updateStats();
+  renderEmails();
+}
+
+loadEmails();
+setInterval(loadEmails, 60000);
+</script>
+</body>
+</html>
