@@ -409,6 +409,31 @@ textarea { resize: vertical; line-height: 1.6; }
 .add-faq-btn:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-light); }
 
 .adv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0;
+}
+.toggle-label { font-size: 13px; color: var(--text2); }
+.toggle-label small { display: block; font-size: 11px; color: var(--text3); margin-top: 1px; }
+.toggle-switch {
+  position: relative; width: 36px; height: 20px; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--surface3); border-radius: 999px;
+  border: 1px solid var(--border2);
+  cursor: pointer; transition: background 0.2s;
+}
+.toggle-track::after {
+  content: ''; position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--text3); transition: transform 0.2s, background 0.2s;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(16px); background: #fff; }
 </style>
 </head>
 <body>
@@ -533,6 +558,26 @@ textarea { resize: vertical; line-height: 1.6; }
       <div class="field">
         <label>Podpis</label>
         <input type="text" id="signature" value="Tým zákaznické podpory, Elektro Novák" />
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label">
+          Automatický podpis
+          <small>Agent přidá podpis na konec každé odpovědi</small>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="use-signature" checked />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label">
+          Mluvit za firmu v množném čísle
+          <small>„Děkujeme" místo „Děkuji", „Pomůžeme" místo „Pomohu"</small>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="use-plural" checked />
+          <span class="toggle-track"></span>
+        </label>
       </div>
     </div>
 
@@ -736,6 +781,8 @@ async function generateReply() {
   const industry = document.getElementById('industry').value;
   const companyDesc = document.getElementById('company-desc').value;
   const signature = document.getElementById('signature').value;
+  const useSignature = document.getElementById('use-signature').checked;
+  const usePlural = document.getElementById('use-plural').checked;
   const subject = document.getElementById('email-subject').value;
   const body = document.getElementById('email-body').value;
 
@@ -794,6 +841,7 @@ Pravidla odpovídání:
 - Oslovení: ${salutationMap[salutation]}
 - Délka odpovědi: ${lengthMap[replyLength]}
 - Vždy piš česky
+- Mluv za firmu v ${usePlural ? "množném čísle (Děkujeme, Pomůžeme, Rádi vám poradíme...)" : "jednotném čísle (Děkuji, Pomohu, Rád vám poradím...)"}
 - Buď konkrétní a nápomocný
 - Pokud nevíš přesnou informaci, nabídni prověření nebo kontakt
 - Ukončuj e-mail podpisem: "${signature}"
