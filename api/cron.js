@@ -1,23 +1,24 @@
-import Imap from 'imap';
-import { simpleParser } from 'mailparser';
-import { kv } from '@vercel/kv';
+const Imap = require('imap');
+const { simpleParser } = require('mailparser');
+const { Redis } = require('@upstash/redis');
 
-const DAILY_LIMIT = 25;
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
-function getImapConfig() {
-  return {
-    user: process.env.EMAIL,
-    password: process.env.EMAIL_PASSWORD,
-    host: process.env.IMAP_HOST,
-    port: parseInt(process.env.IMAP_PORT || '993'),
-    tls: true,
-    tlsOptions: { rejectUnauthorized: false }
-  };
-}
-
-function fetchNewEmails() {
+function fetchEmailsForClient(client) {
   return new Promise((resolve, reject) => {
-    const imap = new Imap(getImapConfig());
+    const imap = new Imap({
+      user: client.email,
+      password: client.emailPassword,
+      host: client.imapHost,
+      port: parseInt(client.imapPort || '993'),
+      tls: true,
+      tlsOptions: { rejectUnauthorized: false },
+      connTimeout: 15000,
+    });
+
     const emails = [];
 
     imap.once('ready', () => {
@@ -27,7 +28,9 @@ function fetchNewEmails() {
           if (err) return reject(err);
           if (!results || results.length === 0) { imap.end(); return resolve([]); }
 
-          const fetch = imap.fetch(results, { bodies: '', markSeen: true });
+          const toFetch = results.slice(0, 10); // max 10 per run
+          const fetch = imap.fetch(toFetch, { bodies: '', markSeen: true });
+
           fetch.on('message', (msg) => {
             let uid;
             msg.on('attributes', (attrs) => { uid = attrs.uid; });
@@ -44,43 +47,52 @@ function fetchNewEmails() {
             });
           });
           fetch.once('end', () => imap.end());
+          fetch.once('error', reject);
         });
       });
     });
+
     imap.once('end', () => resolve(emails));
     imap.once('error', reject);
     imap.connect();
   });
 }
 
-function buildSystemPrompt(config) {
-  const name = config.companyName || 'naše firma';
-  const signature = config.signature || `Tým zákaznické podpory, ${name}`;
-  const tone = config.tone || 'přátelský a profesionální';
-  const salutation = config.salutation === 'tykani' ? 'Tyká zákazníkům' : 'Vyká zákazníkům';
-  const length = { kratka: 'krátká', dlouha: 'podrobná' }[config.replyLength] || 'střední';
+function buildSystemPrompt(client) {
+  const name = client.companyName || 'naše firma';
+  const signature = client.signature || `Tým zákaznické podpory, ${name}`;
+  const tone = client.tone || 'přátelský a profesionální';
+  const salutationMap = {
+    vykani: 'Vyká zákazníkům',
+    tykani: 'Tyká zákazníkům',
+    jmeno: 'Oslovuje zákazníky jménem pokud je zná'
+  };
+  const lengthMap = { kratka: 'krátká', dlouha: 'podrobná' };
+  const plural = client.usePlural !== false;
+  const useSignature = client.useSignature !== false;
 
-  let prompt = `Jsi AI asistent zákaznické podpory pro firmu "${name}"${config.industry ? ` (${config.industry})` : ''}.
-${config.companyDesc ? `\nO firmě: ${config.companyDesc}` : ''}
+  let prompt = `Jsi AI asistent zákaznické podpory pro firmu "${name}"${client.industry ? ` (${client.industry})` : ''}.
+${client.companyDesc ? `\nO firmě: ${client.companyDesc}` : ''}
 Pravidla:
 - Tón: ${tone}
-- Oslovení: ${salutation}
-- Délka: ${length}
+- Oslovení: ${salutationMap[client.salutation] || salutationMap.vykani}
+- Délka odpovědi: ${lengthMap[client.replyLength] || 'střední'}
+- Mluv za firmu v ${plural ? 'množném čísle (Děkujeme, Pomůžeme...)' : 'jednotném čísle (Děkuji, Pomohu...)'}
 - Piš česky
-- Podpis: "${signature}"
+${useSignature ? `- Ukončuj podpisem: "${signature}"` : '- Nepřidávej podpis'}
 - Piš pouze text odpovědi bez předmětu`;
 
-  if (config.faqs?.length > 0)
-    prompt += '\n\nFAQ:\n' + config.faqs.map((f, i) => `Q${i+1}: ${f.q}\nA${i+1}: ${f.a}`).join('\n');
-  if (config.escalationContact)
-    prompt += `\n\nEskalace: Pokud ${config.escalationWhen || 'problém nelze vyřešit'}, přesměruj na: ${config.escalationContact}`;
-  if (config.forbiddenTopics)
-    prompt += `\n\nNIKDY nekomentuj: ${config.forbiddenTopics}`;
+  if (client.faqs?.length > 0)
+    prompt += '\n\nFAQ:\n' + client.faqs.map((f, i) => `Q${i+1}: ${f.q}\nA${i+1}: ${f.a}`).join('\n');
+  if (client.escalationContact)
+    prompt += `\n\nEskalace: Pokud ${client.escalationWhen || 'problém nelze vyřešit'}, přesměruj na: ${client.escalationContact}`;
+  if (client.forbiddenTopics)
+    prompt += `\n\nNIKDY nekomentuj: ${client.forbiddenTopics}`;
 
   return prompt;
 }
 
-async function generateReply(email, config) {
+async function generateReply(email, client) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -91,7 +103,7 @@ async function generateReply(email, config) {
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1000,
-      system: buildSystemPrompt(config),
+      system: buildSystemPrompt(client),
       messages: [{ role: 'user', content: `Od: ${email.from}\nPředmět: ${email.subject}\n\n${email.text}\n\nNapiš odpověď.` }]
     })
   });
@@ -105,41 +117,76 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    const clientIds = (await redis.get('client_index')) || [];
+    if (clientIds.length === 0) return res.status(200).json({ message: 'Žádní klienti' });
+
     const today = new Date().toISOString().split('T')[0];
-    const countKey = `daily_count:${today}`;
-    const count = (await kv.get(countKey)) || 0;
+    const results = [];
 
-    if (count >= DAILY_LIMIT)
-      return res.status(200).json({ message: 'Denní limit vyčerpán', count });
+    for (const clientId of clientIds) {
+      const client = await redis.get(`client:${clientId}`);
+      if (!client || !client.active) continue;
 
-    const config = (await kv.get('agent_config')) || {};
-    const emails = await fetchNewEmails();
+      // Per-client daily limit
+      const countKey = `daily_count:${clientId}:${today}`;
+      const count = (await redis.get(countKey)) || 0;
+      const limit = client.dailyLimit || 25;
+      if (count >= limit) {
+        results.push({ clientId, message: 'Denní limit vyčerpán' });
+        continue;
+      }
 
-    if (emails.length === 0)
-      return res.status(200).json({ message: 'Žádné nové e-maily' });
+      let processed = 0;
+      try {
+        const emails = await fetchEmailsForClient(client);
 
-    let processed = 0;
-    for (const email of emails) {
-      const currentCount = (await kv.get(countKey)) || 0;
-      if (currentCount >= DAILY_LIMIT) break;
+        for (const email of emails) {
+          const currentCount = (await redis.get(countKey)) || 0;
+          if (currentCount >= limit) break;
 
-      const reply = await generateReply(email, config);
-      const id = `email_${email.uid}_${Date.now()}`;
-      const record = { id, uid: email.uid, from: email.from, subject: email.subject, body: email.text, date: email.date, reply, status: 'pending', createdAt: new Date().toISOString() };
+          const reply = await generateReply(email, client);
+          const id = `email_${clientId}_${email.uid}_${Date.now()}`;
+          const record = {
+            id, clientId,
+            uid: email.uid,
+            from: email.from,
+            subject: email.subject,
+            body: email.text,
+            date: email.date,
+            reply,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+          };
 
-      await kv.set(`email:${id}`, JSON.stringify(record));
-      const index = (await kv.get('email_index')) || [];
-      index.unshift(id);
-      if (index.length > 500) index.pop();
-      await kv.set('email_index', index);
-      await kv.set(countKey, currentCount + 1);
-      await kv.expire(countKey, 86400);
-      processed++;
+          await redis.set(`email:${id}`, record);
+
+          // Global index
+          const globalIndex = (await redis.get('email_index')) || [];
+          globalIndex.unshift(id);
+          if (globalIndex.length > 1000) globalIndex.pop();
+          await redis.set('email_index', globalIndex);
+
+          // Per-client index
+          const clientIndex = (await redis.get(`email_index:${clientId}`)) || [];
+          clientIndex.unshift(id);
+          if (clientIndex.length > 200) clientIndex.pop();
+          await redis.set(`email_index:${clientId}`, clientIndex);
+
+          await redis.set(countKey, currentCount + 1);
+          await redis.expire(countKey, 86400);
+          processed++;
+        }
+
+        results.push({ clientId, name: client.companyName, processed });
+      } catch (err) {
+        console.error(`Error for client ${clientId}:`, err.message);
+        results.push({ clientId, name: client.companyName, error: err.message });
+      }
     }
 
-    return res.status(200).json({ message: `Zpracováno ${processed} e-mailů`, processed });
-  } catch (error) {
-    console.error('Cron error:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(200).json({ results });
+  } catch (e) {
+    console.error('Cron error:', e);
+    return res.status(500).json({ error: e.message });
   }
 }

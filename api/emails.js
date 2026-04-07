@@ -1,31 +1,42 @@
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 module.exports = async function handler(req, res) {
+  const auth = req.headers['x-admin-secret'];
+  if (auth !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   if (req.method === 'GET') {
     try {
-      const index = (await kv.get('email_index')) || [];
+      const { clientId } = req.query;
+      const indexKey = clientId ? `email_index:${clientId}` : 'email_index';
+      const index = (await redis.get(indexKey)) || [];
       const emails = [];
-      for (const id of index.slice(0, 50)) {
-        const raw = await kv.get(`email:${id}`);
-        if (raw) emails.push(JSON.parse(raw));
+      for (const id of index.slice(0, 100)) {
+        const raw = await redis.get(`email:${id}`);
+        if (raw) emails.push(raw);
       }
       return res.status(200).json(emails);
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
     }
   }
 
   if (req.method === 'PATCH') {
-    // Update status to 'ignored'
-    const { emailId, status } = req.body;
     try {
-      const record = JSON.parse(await kv.get(`email:${emailId}`));
+      const { emailId, status } = req.body;
+      const record = await redis.get(`email:${emailId}`);
       if (!record) return res.status(404).json({ error: 'Nenalezeno' });
       record.status = status;
-      await kv.set(`email:${emailId}`, JSON.stringify(record));
+      await redis.set(`email:${emailId}`, record);
       return res.status(200).json({ success: true });
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
     }
   }
 
