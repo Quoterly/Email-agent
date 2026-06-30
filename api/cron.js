@@ -21,6 +21,7 @@ function fetchEmailsForClient(client) {
     });
 
     const emails = [];
+    const parserPromises = []; // track async parsers so we wait for all before resolving
 
     imap.once('ready', () => {
       imap.openBox('INBOX', false, (err) => {
@@ -36,15 +37,20 @@ function fetchEmailsForClient(client) {
             let uid;
             msg.on('attributes', (attrs) => { uid = attrs.uid; });
             msg.on('body', (stream) => {
-              simpleParser(stream, (err, parsed) => {
-                if (!err) emails.push({
-                  uid: String(uid),
-                  from: parsed.from?.text || '',
-                  subject: parsed.subject || '(bez předmětu)',
-                  text: (parsed.text || '').slice(0, 3000),
-                  date: parsed.date?.toISOString() || new Date().toISOString()
+              const p = new Promise((done) => {
+                simpleParser(stream, (err, parsed) => {
+                  if (!err) emails.push({
+                    uid: String(uid),
+                    from: parsed.from?.text || '',
+                    subject: parsed.subject || '(bez předmětu)',
+                    text: (parsed.text || '').slice(0, 3000),
+                    date: parsed.date?.toISOString() || new Date().toISOString(),
+                    messageId: parsed.messageId || '',
+                  });
+                  done();
                 });
               });
+              parserPromises.push(p);
             });
           });
           fetch.once('end', () => imap.end());
@@ -53,7 +59,9 @@ function fetchEmailsForClient(client) {
       });
     });
 
-    imap.once('end', () => resolve(emails));
+    // Wait for all simpleParser callbacks before resolving — fixes race condition
+    // where imap.end() fired before async parsers completed
+    imap.once('end', () => Promise.all(parserPromises).then(() => resolve(emails)).catch(reject));
     imap.once('error', reject);
     imap.connect();
   });
@@ -93,15 +101,16 @@ async function sendNotification(client, processed) {
   const transporter = nodemailer.createTransport({
     host: client.smtpHost,
     port: parseInt(client.smtpPort || '465'),
-    secure: parseInt(client.smtpPort) !== 587,
+    secure: parseInt(client.smtpPort || '465') !== 587,
     auth: { user: client.email, pass: client.emailPassword },
   });
 
+  const appUrl = process.env.APP_URL || 'https://email-agent-indol-seven.vercel.app';
   await transporter.sendMail({
     from: client.email,
     to: client.email,
     subject: `Email Agent — ${processed} nových návrhů odpovědí čeká na schválení`,
-    text: `Dobrý den,\n\ndnes jsme zkontrolovali vaši emailovou schránku a připravili ${processed} návrhů odpovědí.\n\nPřihlaste se a schvalte je: https://email-agent-indol-seven.vercel.app/klient`,
+    text: `Dobrý den,\n\ndnes jsme zkontrolovali vaši emailovou schránku a připravili ${processed} návrhů odpovědí.\n\nPřihlaste se a schvalte je: ${appUrl}/klient`,
   });
 }
 
@@ -144,6 +153,10 @@ async function generateReply(email, client) {
       messages: [{ role: 'user', content: `Od: ${email.from}\nPředmět: ${email.subject}\n\n${email.text}\n\nNapiš odpověď.` }]
     })
   });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(`Anthropic API ${response.status}: ${err.error?.message || 'unknown error'}`);
+  }
   const data = await response.json();
   return data.content?.map(b => b.text || '').join('') || '';
 }
@@ -192,6 +205,7 @@ module.exports = async function handler(req, res) {
               subject: email.subject,
               body: email.text,
               date: email.date,
+              messageId: email.messageId || '',
               reply: '',
               status: 'ignored',
               createdAt: new Date().toISOString()
@@ -214,6 +228,7 @@ module.exports = async function handler(req, res) {
             subject: email.subject,
             body: email.text,
             date: email.date,
+            messageId: email.messageId || '',
             reply,
             status: 'pending',
             createdAt: new Date().toISOString()

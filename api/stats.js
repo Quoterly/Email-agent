@@ -1,9 +1,4 @@
-const { Redis } = require('@upstash/redis');
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+const { redis } = require('./_auth');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -20,7 +15,7 @@ module.exports = async function handler(req, res) {
       const emailIds = (await redis.get(`email_index:${id}`)) || [];
       let pending = 0, sent = 0, ignored = 0;
 
-      for (const eid of emailIds.slice(0, 200)) {
+      for (const eid of emailIds) {
         const email = await redis.get(`email:${eid}`);
         if (!email) continue;
         if (email.status === 'pending') pending++;

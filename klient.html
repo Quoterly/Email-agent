@@ -474,7 +474,8 @@ async function sendEmail(id) {
 
 async function ignoreEmail(id) {
   const headers = { ...getAuthHeaders(), 'Content-Type': 'application/json' };
-  await fetch('/api/emails', { method: 'PATCH', headers, body: JSON.stringify({ emailId: id, status: 'ignored' }) });
+  const res = await fetch('/api/emails', { method: 'PATCH', headers, body: JSON.stringify({ emailId: id, status: 'ignored' }) });
+  if (!res.ok) return;
   const e = allEmails.find(e => e.id === id); if (e) e.status = 'ignored';
   updateStats(); renderEmails();
 }

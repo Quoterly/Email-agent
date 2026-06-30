@@ -1,10 +1,4 @@
-const { Redis } = require('@upstash/redis');
-const { getAuthContext } = require('./_auth');
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+const { redis, getAuthContext } = require('./_auth');
 
 module.exports = async function handler(req, res) {
   // GET - list all clients (admin only)
@@ -101,6 +95,17 @@ module.exports = async function handler(req, res) {
     }
     try {
       const { id } = req.body;
+      // Clean up all email records for this client
+      const emailIndex = (await redis.get(`email_index:${id}`)) || [];
+      if (emailIndex.length > 0) {
+        await Promise.all(emailIndex.map(eid => redis.del(`email:${eid}`)));
+        await redis.del(`email_index:${id}`);
+        // Remove client's emails from the global index too
+        const globalIndex = (await redis.get('email_index')) || [];
+        const clientEmailSet = new Set(emailIndex);
+        await redis.set('email_index', globalIndex.filter(eid => !clientEmailSet.has(eid)));
+      }
+      // Delete client record and remove from index
       await redis.del(`client:${id}`);
       const ids = (await redis.get('client_index')) || [];
       await redis.set('client_index', ids.filter(i => i !== id));

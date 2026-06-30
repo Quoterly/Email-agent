@@ -34,6 +34,10 @@ module.exports = async function handler(req, res) {
       to: record.from,
       subject: record.subject.startsWith('Re:') ? record.subject : `Re: ${record.subject}`,
       text: replyText,
+      ...(record.messageId && {
+        inReplyTo: record.messageId,
+        references: record.messageId,
+      }),
     });
 
     record.status = 'sent';
