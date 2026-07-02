@@ -82,6 +82,10 @@ input[type=password]:focus,input[type=email]:focus,input[type=text]:focus{border
 .toggle-switch input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
 .toggle-switch input:checked+.toggle-track::after{transform:translateX(16px);background:#fff}
 .field-hint{font-size:11px;color:var(--text3);margin-top:3px}
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;display:flex;align-items:center;line-height:1}
+.pw-toggle:hover{color:var(--text2)}
+.pw-toggle svg{width:16px;height:16px}
 
 @media(max-width:500px){.stats-row{grid-template-columns:1fr 1fr}.main{padding:1rem .75rem 3rem}}
 .settings-panel{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:1rem;display:none}
@@ -115,7 +119,13 @@ input[type=password]:focus,input[type=email]:focus,input[type=text]:focus{border
     </div>
     <div class="field">
       <label>Heslo</label>
-      <input type="password" id="login-pw" placeholder="Zadejte heslo..." onkeydown="if(event.key==='Enter')login()" />
+      <div class="pw-wrap">
+        <input type="password" id="login-pw" placeholder="Zadejte heslo..." onkeydown="if(event.key==='Enter')login()" style="padding-right:36px" />
+        <button class="pw-toggle" type="button" onclick="togglePw('login-pw',this)" tabindex="-1">
+          <svg class="eye-on" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/></svg>
+          <svg class="eye-off" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/><line x1="2" y1="2" x2="12" y2="12"/></svg>
+        </button>
+      </div>
     </div>
     <div class="login-error" id="login-err">Nesprávné heslo</div>
     <button class="btn btn-primary" style="width:100%" onclick="login()">Přihlásit se</button>
@@ -255,6 +265,14 @@ let allEmails = [], currentFilter = 'all', clientPassword = '', clientEmail = ''
     document.getElementById('login-screen').style.display = 'flex';
   }
 })();
+
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.querySelector('.eye-on').style.display = show ? 'none' : '';
+  btn.querySelector('.eye-off').style.display = show ? '' : 'none';
+}
 
 async function login() {
   const email = document.getElementById('login-email').value.trim();

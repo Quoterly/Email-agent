@@ -65,6 +65,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-bg)}
 .btn-sm{padding:5px 11px;font-size:12px}
 .btn svg{width:13px;height:13px}
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;display:flex;align-items:center;line-height:1}
+.pw-toggle:hover{color:var(--text2)}
+.pw-toggle svg{width:16px;height:16px}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:1rem}
 .modal-overlay.open{display:flex}
@@ -117,7 +121,7 @@ textarea{resize:vertical;line-height:1.6}
 <div class="login-wrap" id="login-screen">
   <div class="login-box">
     <div><div class="login-title">Email Agent</div><div style="font-size:13px;color:var(--text3);margin-top:4px;">Přihlášení provozovatele</div></div>
-    <div class="field"><label>Admin heslo</label><input type="password" id="login-pw" placeholder="Zadejte heslo..." onkeydown="if(event.key==='Enter')login()" autofocus /></div>
+    <div class="field"><label>Admin heslo</label><div class="pw-wrap"><input type="password" id="login-pw" placeholder="Zadejte heslo..." onkeydown="if(event.key==='Enter')login()" autofocus style="padding-right:36px" /><button class="pw-toggle" type="button" onclick="togglePw('login-pw',this)" tabindex="-1"><svg class="eye-on" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/></svg><svg class="eye-off" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/><line x1="2" y1="2" x2="12" y2="12"/></svg></button></div></div>
     <div class="login-error" id="login-err" style="display:none">Nesprávné heslo</div>
     <button class="btn btn-primary" onclick="login()">Přihlásit se</button>
   </div>
@@ -294,6 +298,7 @@ let adminSecret='', allStats=[], allClients=[], editingId=null, selectedTone='p�
 
 function toggleCustomIndustry(selectId,inputId){const input=document.getElementById(inputId);const isOther=document.getElementById(selectId).value==='Jiné';input.style.display=isOther?'block':'none';if(isOther)input.focus();}
 function toggleTheme(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',d?'light':'dark');document.getElementById('ti-l').style.display=d?'block':'none';document.getElementById('ti-d').style.display=d?'none':'block';document.getElementById('theme-label').textContent=d?'světlý':'tmavý';localStorage.setItem('ea_theme',d?'light':'dark');}
+function togglePw(id,btn){const inp=document.getElementById(id);const show=inp.type==='password';inp.type=show?'text':'password';btn.querySelector('.eye-on').style.display=show?'none':'';btn.querySelector('.eye-off').style.display=show?'':'none';}
 function login(){const pw=document.getElementById('login-pw').value;if(!pw)return;adminSecret=pw;document.getElementById('login-err').style.display='none';showApp();}
 function logout(){adminSecret='';document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-pw').value='';}
 function showApp(){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='flex';loadStats();loadClients();}
