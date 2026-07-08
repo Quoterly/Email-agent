@@ -97,20 +97,34 @@ ${useSignature ? `- Ukončuj podpisem: "${signature}"` : '- Nepřidávej podpis'
   return prompt;
 }
 
+function pluralNavrhu(n) {
+  if (n === 1) return '1 návrh';
+  if (n >= 2 && n <= 4) return `${n} návrhy`;
+  return `${n} návrhů`;
+}
+
 async function sendNotification(client, processed) {
+  const subjects = [
+    'Máte nové návrhy odpovědí — Wise Agent',
+    'Wise Agent: Zkontrolujte návrhy od vašeho AI asistenta',
+    'Nové návrhy odpovědí čekají na schválení',
+    'Váš AI asistent připravil návrhy odpovědí',
+    'Denní přehled — návrhy odpovědí od Wise Agenta',
+  ];
+  const subject = subjects[Math.floor(Math.random() * subjects.length)];
+  const greeting = client.contactName ? `Dobrý den, ${client.contactName},` : 'Dobrý den,';
+  const appUrl = process.env.APP_URL || 'https://wiseagent.cz';
   const transporter = nodemailer.createTransport({
     host: client.smtpHost,
     port: parseInt(client.smtpPort || '465'),
     secure: parseInt(client.smtpPort || '465') !== 587,
     auth: { user: client.email, pass: client.emailPassword },
   });
-
-  const appUrl = process.env.APP_URL || 'https://email-agent-indol-seven.vercel.app';
   await transporter.sendMail({
     from: client.email,
     to: client.email,
-    subject: `Email Agent — ${processed} nových návrhů odpovědí čeká na schválení`,
-    text: `Dobrý den,\n\ndnes jsme zkontrolovali vaši emailovou schránku a připravili ${processed} návrhů odpovědí.\n\nPřihlaste se a schvalte je: ${appUrl}/klient`,
+    subject,
+    text: `${greeting}\n\ndnes jsme zkontrolovali vaši emailovou schránku a připravili ${pluralNavrhu(processed)} odpovědí.\n\nPřihlaste se a schvalte je: ${appUrl}/klient`,
   });
 }
 
