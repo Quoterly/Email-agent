@@ -83,7 +83,8 @@
     display: flex; align-items: center;
     text-decoration: none;
   }
-  .nav-logo img { height: 32px; width: auto; display: block; }
+  .nav-logo .logo-wrap { height: 40px; overflow: hidden; display: flex; align-items: flex-start; }
+  .nav-logo .logo-wrap img { height: 56px; width: auto; display: block; }
   .nav-cta {
     background: #267A52; color: #fff;
     border: none; padding: 7px 18px;
@@ -335,7 +336,7 @@
 
 <nav>
   <a class="nav-logo" href="#">
-    <img src="/images/logo-6-modre-brand.png" alt="Wise Agent" />
+    <div class="logo-wrap"><img src="/images/logo-1-bez-pozadi.png" alt="Wise Agent" /></div>
   </a>
   <a href="#cta" class="nav-cta">Vyzkoušet zdarma</a>
 </nav>
