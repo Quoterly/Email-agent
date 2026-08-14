@@ -100,8 +100,9 @@
   }
   .nav-hamburger:hover { background: rgba(255,255,255,0.08); }
   .nav-hamburger span {
-    display: block; width: 20px; height: 2px; background: #E4EDF7;
-    border-radius: 1px; transition: transform 0.22s ease, opacity 0.22s ease;
+    display: block; width: 22px; height: 2px; background: #E4EDF7;
+    border-radius: 2px; transition: transform 0.22s ease, opacity 0.22s ease;
+    flex-shrink: 0;
   }
   .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
@@ -325,6 +326,7 @@
   .cta-band {
     background: #071629; text-align: center;
     padding: clamp(4.5rem, 9vw, 7rem) clamp(1.5rem, 5vw, 4rem);
+    scroll-margin-top: 60px;
   }
   .cta-band .eyebrow { color: rgba(61,200,122,0.65); margin-bottom: 0.75rem; }
   .cta-band .section-h { color: #E4EDF7; max-width: 580px; margin: 0 auto 0.9rem; }
@@ -342,8 +344,8 @@
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 1rem;
   }
-  .footer-brand { font-size: 0.85rem; color: #3A6080; }
-  .footer-brand strong { color: #7A9DC0; }
+  .footer-brand { font-size: 0.82rem; color: #3A6080; display: flex; align-items: center; gap: 0.6rem; }
+  .footer-brand span { color: #3A6080; }
   .footer-links { display: flex; gap: 1.5rem; }
   .footer-links a {
     font-size: 0.82rem; color: #3A6080;
@@ -529,7 +531,7 @@
 </section>
 
 <footer>
-  <div class="footer-brand"><img src="/images/logo.svg" alt="Wise Agent" style="height:32px;display:inline-block;vertical-align:middle"> &nbsp;·&nbsp; AI asistent pro emailovou komunikaci</div>
+  <div class="footer-brand"><img src="/images/logo.svg" alt="Wise Agent" style="height:28px;display:block"><span>AI asistent pro emailovou komunikaci</span></div>
   <div class="footer-links">
     <a href="mailto:info@wiseagent.cz">info@wiseagent.cz</a>
     <a href="/klient">Klientský panel</a>
