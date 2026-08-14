@@ -92,6 +92,40 @@
     transition: background 0.15s;
   }
   .nav-cta:hover { background: #34A26B; }
+  .nav-right { display: flex; align-items: center; gap: 0.75rem; position: relative; }
+  .nav-hamburger {
+    background: none; border: none; cursor: pointer; color: #E4EDF7;
+    padding: 6px; display: flex; flex-direction: column; gap: 5px;
+    border-radius: 6px; transition: background 0.15s;
+  }
+  .nav-hamburger:hover { background: rgba(255,255,255,0.08); }
+  .nav-hamburger span {
+    display: block; width: 20px; height: 2px; background: #E4EDF7;
+    border-radius: 1px; transition: transform 0.22s ease, opacity 0.22s ease;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .nav-dropdown {
+    position: absolute; top: calc(100% + 12px); right: 0;
+    background: rgba(7, 22, 41, 0.98);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; min-width: 210px; overflow: hidden;
+    opacity: 0; transform: translateY(-6px); pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .nav-dropdown.open { opacity: 1; transform: none; pointer-events: auto; }
+  .nav-dropdown a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 16px; color: #E4EDF7; text-decoration: none;
+    font-size: 0.875rem; transition: background 0.15s;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-dropdown a:last-child { border-bottom: none; }
+  .nav-dropdown a:hover { background: rgba(255,255,255,0.07); }
+  .nav-dropdown svg { flex-shrink: 0; opacity: 0.6; }
 
   /* ── hero ── */
   .hero {
@@ -337,7 +371,22 @@
   <a class="nav-logo" href="#">
     <img src="/images/logo.svg" alt="Wise Agent" />
   </a>
-  <a href="#cta" class="nav-cta">Vyzkoušet zdarma</a>
+  <div class="nav-right">
+    <a href="#demo" class="nav-cta">Vyzkoušet zdarma</a>
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-dropdown" id="nav-dropdown" role="menu">
+      <a href="/klient" role="menuitem">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="13" height="10" rx="1.5"/><path d="M1 5.5l6.5 4 6.5-4"/></svg>
+        Klientský portál
+      </a>
+      <a href="/admin" role="menuitem">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="6.5"/><path d="M7.5 4v3.5l2.5 1.5"/></svg>
+        Admin portál
+      </a>
+    </div>
+  </div>
 </nav>
 
 <section class="hero">
@@ -349,7 +398,7 @@
     <h1>Vaši zákazníci dostanou<br>odpověď. <em>Vždy.</em></h1>
     <p class="hero-sub">Wise Agent přečte příchozí emaily, připraví návrh odpovědi přizpůsobený vaší firmě a vy jej jedním klikem schválíte a odešlete.</p>
     <div class="hero-actions">
-      <a href="#cta" class="btn-primary">Chci vyzkoušet zdarma</a>
+      <a href="#demo" class="btn-primary">Chci vyzkoušet zdarma</a>
       <a href="#how" class="btn-ghost">Jak to funguje →</a>
     </div>
     <p class="hero-disclaimer">První měsíc <span>zdarma</span> &nbsp;·&nbsp; Žádná kreditní karta &nbsp;·&nbsp; Zrušení kdykoliv</p>
@@ -466,12 +515,12 @@
           Podpora v češtině
         </li>
       </ul>
-      <a href="#cta" class="btn-primary price-cta">Začít zdarma</a>
+      <a href="#demo" class="btn-primary price-cta">Začít zdarma</a>
     </div>
   </div>
 </section>
 
-<section class="cta-band" id="cta">
+<section class="cta-band" id="demo">
   <p class="eyebrow">Začněte dnes</p>
   <h2 class="section-h">Přestaňte řešit emaily.<br>Začněte podnikat.</h2>
   <p class="section-p">Wise Agent zvládne emailovou komunikaci za vás. Vy máte vždy poslední slovo.</p>
@@ -489,6 +538,21 @@
 </footer>
 
 <script>
+  function toggleMenu() {
+    const btn = document.getElementById('nav-hamburger');
+    const menu = document.getElementById('nav-dropdown');
+    const open = menu.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open);
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#nav-hamburger') && !e.target.closest('#nav-dropdown')) {
+      document.getElementById('nav-hamburger').classList.remove('open');
+      document.getElementById('nav-dropdown').classList.remove('open');
+      document.getElementById('nav-hamburger').setAttribute('aria-expanded', 'false');
+    }
+  });
+
   const io = new IntersectionObserver(
     (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }),
     { threshold: 0.1 }
