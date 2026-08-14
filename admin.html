@@ -118,7 +118,7 @@ textarea{resize:vertical;line-height:1.6}
 
 <div class="login-wrap" id="login-screen">
   <div class="login-box">
-    <div><div class="login-title">Email Agent</div><div style="font-size:13px;color:var(--text3);margin-top:4px;">Přihlášení provozovatele</div></div>
+    <div><img src="/images/logo.svg" alt="Wise Agent" style="height:32px;display:block;margin-bottom:4px"><div style="font-size:13px;color:var(--text3);margin-top:4px;">Přihlášení provozovatele</div></div>
     <div class="field"><label>Admin heslo</label><div class="pw-wrap"><input type="password" id="login-pw" placeholder="Zadejte heslo..." onkeydown="if(event.key==='Enter')login()" autofocus style="padding-right:36px" /><button class="pw-toggle" type="button" onclick="togglePw('login-pw',this)" tabindex="-1"><svg class="eye-on" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/></svg><svg class="eye-off" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/><line x1="2" y1="2" x2="12" y2="12"/></svg></button></div></div>
     <div class="login-error" id="login-err" style="display:none">Nesprávné heslo</div>
     <button class="btn btn-primary" onclick="login()">Přihlásit se</button>
