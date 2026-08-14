@@ -99,14 +99,7 @@
     border-radius: 6px; transition: background 0.15s;
   }
   .nav-hamburger:hover { background: rgba(255,255,255,0.08); }
-  .nav-hamburger span {
-    display: block; width: 22px; height: 2px; background: #E4EDF7;
-    border-radius: 2px; transition: transform 0.22s ease, opacity 0.22s ease;
-    flex-shrink: 0;
-  }
-  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .nav-hamburger svg { display: block; }
   .nav-dropdown {
     position: absolute; top: calc(100% + 12px); right: 0;
     background: rgba(7, 22, 41, 0.98);
@@ -374,9 +367,13 @@
     <img src="/images/logo.svg" alt="Wise Agent" />
   </a>
   <div class="nav-right">
-    <a href="#demo" class="nav-cta">Vyzkoušet zdarma</a>
+    <a href="#demo" class="nav-cta" onclick="event.preventDefault();document.querySelector('#demo').scrollIntoView({behavior:'smooth'})">Vyzkoušet zdarma</a>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
-      <span></span><span></span><span></span>
+      <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+        <rect y="0" width="22" height="2" rx="1" fill="white"/>
+        <rect y="7" width="22" height="2" rx="1" fill="white"/>
+        <rect y="14" width="22" height="2" rx="1" fill="white"/>
+      </svg>
     </button>
     <div class="nav-dropdown" id="nav-dropdown" role="menu">
       <a href="/klient" role="menuitem">
