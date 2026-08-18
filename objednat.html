@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Objednat — Wise Agent</title>
+<link rel="icon" type="image/png" href="/images/logo-1-bez-pozadi.png">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F4F7FB; --surface: #FFFFFF; --border: #D8E2EE;
+    --text1: #0C1C2E; --text2: #3A5270; --text3: #7896B4;
+    --sage: #267A52; --sage-bright: #34A26B; --sage-bg: #E6F4EE;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #091725; --surface: #0D2038; --border: #1A3352;
+      --text1: #E4EDF7; --text2: #7A9DC0; --text3: #3A6080;
+      --sage: #3DC87A; --sage-bright: #3DC87A; --sage-bg: #0C2A1A;
+    }
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text1);
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(1.5rem, 5vw, 4rem); height: 60px;
+    background: rgba(7, 22, 41, 0.95);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { display: flex; align-items: center; text-decoration: none; }
+  .nav-logo img { height: 34px; display: block; }
+  .nav-back {
+    color: #7A9DC0; font-size: 0.85rem; text-decoration: none;
+    display: flex; align-items: center; gap: 6px; transition: color 0.15s;
+  }
+  .nav-back:hover { color: #E4EDF7; }
+
+  main {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 100px clamp(1.5rem, 5vw, 4rem) 60px;
+  }
+
+  .wrap {
+    width: 100%; max-width: 860px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;
+  }
+
+  .info-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(61,200,122,0.1); border: 1px solid rgba(61,200,122,0.22);
+    color: #3DC87A; font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 1.5rem;
+  }
+  .info-h {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.6rem); font-weight: 400;
+    color: var(--text1); line-height: 1.18; letter-spacing: -0.02em;
+    text-wrap: balance; margin-bottom: 1.1rem;
+  }
+  .info-h em { font-style: italic; color: var(--sage); }
+  .info-sub { font-size: 0.975rem; color: var(--text2); line-height: 1.72; margin-bottom: 2rem; }
+
+  .perks { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .perks li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.875rem; color: var(--text2); }
+  .perk-icon {
+    width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;
+    background: var(--sage-bg); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: var(--sage);
+  }
+
+  .price-note {
+    margin-top: 1.75rem; padding: 1rem 1.25rem;
+    background: var(--sage-bg); border-radius: 10px;
+    font-size: 0.875rem; color: var(--sage); font-weight: 500;
+  }
+
+  .form-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem 2.25rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .form-title { font-size: 1.05rem; font-weight: 600; color: var(--text1); margin-bottom: 0.35rem; }
+  .form-sub { font-size: 0.82rem; color: var(--text3); margin-bottom: 1.75rem; }
+
+  .field { margin-bottom: 1.1rem; }
+  label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text2); margin-bottom: 0.4rem; }
+  input[type="text"], input[type="email"], input[type="tel"], textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 13px;
+    font-size: 0.9rem; color: var(--text1); font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+  }
+  input:focus, textarea:focus {
+    border-color: var(--sage); box-shadow: 0 0 0 3px rgba(38,122,82,0.1);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .opt { font-weight: 400; color: var(--text3); }
+
+  .btn-submit {
+    display: block; width: 100%; background: var(--sage); color: #fff;
+    border: none; border-radius: 8px; padding: 12px 20px;
+    font-size: 0.975rem; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: background 0.15s, transform 0.12s; margin-top: 1.5rem;
+  }
+  .btn-submit:hover { background: var(--sage-bright); transform: translateY(-1px); }
+  .form-note { text-align: center; font-size: 0.78rem; color: var(--text3); margin-top: 0.85rem; }
+
+  .success { display: none; text-align: center; padding: 1rem 0; }
+  .success.show { display: block; }
+  .success-icon {
+    width: 56px; height: 56px; background: var(--sage-bg); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.25rem; color: var(--sage);
+  }
+  .success-h { font-size: 1.1rem; font-weight: 600; color: var(--text1); margin-bottom: 0.5rem; }
+  .success-p { font-size: 0.875rem; color: var(--text2); line-height: 1.65; }
+
+  footer {
+    background: #071629; border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 1.75rem clamp(1.5rem, 5vw, 4rem);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-brand { font-size: 0.82rem; color: #3A6080; display: flex; align-items: center; gap: 0.6rem; }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-size: 0.82rem; color: #3A6080; text-decoration: none; transition: color 0.15s; }
+  .footer-links a:hover { color: #7A9DC0; }
+
+  @media (max-width: 700px) {
+    .wrap { grid-template-columns: 1fr; gap: 2.5rem; }
+    main { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <img src="/images/logo.svg" alt="Wise Agent" />
+  </a>
+  <a href="/" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"/>
+    </svg>
+    Zpět
+  </a>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <div>
+      <div class="info-badge">
+        <svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><circle cx="3.5" cy="3.5" r="3.5"/></svg>
+        Začněte hned
+      </div>
+      <h1 class="info-h">Objednejte<br>Wise Agent.<br><em>Bez rizika.</em></h1>
+      <p class="info-sub">Vyplňte formulář a do 24 hodin vás kontaktujeme. Nastavíme vše společně — žádná technická znalost není potřeba.</p>
+      <ul class="perks">
+        <li>
+          <span class="perk-icon">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          První měsíc zcela zdarma
+        </li>
+        <li>
+          <span class="perk-icon">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Osobní onboarding a nastavení agenta
+        </li>
+        <li>
+          <span class="perk-icon">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Žádná kreditní karta předem
+        </li>
+        <li>
+          <span class="perk-icon">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Zrušení kdykoliv, bez závazku
+        </li>
+      </ul>
+      <div class="price-note">
+        990 Kč / měsíc od druhého měsíce &nbsp;·&nbsp; jeden tarif, vše v ceně
+      </div>
+    </div>
+
+    <div class="form-card">
+      <form id="order-form" onsubmit="submitForm(event)">
+        <div class="form-title">Objednávkový formulář</div>
+        <p class="form-sub">Ozveme se do 24 hodin a vše nastavíme společně.</p>
+
+        <div class="field">
+          <label for="f-name">Jméno a příjmení *</label>
+          <input type="text" id="f-name" placeholder="Jana Nováková" required />
+        </div>
+        <div class="field">
+          <label for="f-company">Název firmy *</label>
+          <input type="text" id="f-company" placeholder="Vaše s.r.o." required />
+        </div>
+        <div class="field">
+          <label for="f-email">Email *</label>
+          <input type="email" id="f-email" placeholder="jana@vasefirma.cz" required />
+        </div>
+        <div class="field">
+          <label for="f-phone">Telefon <span class="opt">(nepovinné)</span></label>
+          <input type="tel" id="f-phone" placeholder="+420 600 000 000" />
+        </div>
+        <div class="field">
+          <label for="f-note">Poznámka <span class="opt">(nepovinné)</span></label>
+          <textarea id="f-note" placeholder="Počet emailů týdně, typ dotazů, emailový klient…"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">Odeslat objednávku →</button>
+        <p class="form-note">Odesláním souhlasíte se zpracováním osobních údajů za účelem kontaktování.</p>
+      </form>
+
+      <div class="success" id="success">
+        <div class="success-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <div class="success-h">Objednávka odeslána!</div>
+        <p class="success-p">Ozveme se na zadaný email do 24 hodin. Těšíme se na spolupráci.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-brand"><img src="/images/logo.svg" alt="Wise Agent" style="height:28px;display:block"><span>AI asistent pro emailovou komunikaci</span></div>
+  <div class="footer-links">
+    <a href="mailto:info@wiseagent.cz">info@wiseagent.cz</a>
+    <a href="/klient">Klientský panel</a>
+    <a href="/admin">Admin</a>
+  </div>
+</footer>
+
+<script>
+  function submitForm(e) {
+    e.preventDefault();
+    const name = document.getElementById('f-name').value;
+    const company = document.getElementById('f-company').value;
+    const email = document.getElementById('f-email').value;
+    const phone = document.getElementById('f-phone').value;
+    const note = document.getElementById('f-note').value;
+
+    const body = [
+      `Jméno: ${name}`,
+      `Firma: ${company}`,
+      `Email: ${email}`,
+      phone ? `Telefon: ${phone}` : '',
+      note ? `Poznámka: ${note}` : '',
+    ].filter(Boolean).join('\n');
+
+    window.location.href = `mailto:info@wiseagent.cz?subject=Objednávka Wise Agent — ${encodeURIComponent(company)}&body=${encodeURIComponent(body)}`;
+
+    document.getElementById('order-form').style.display = 'none';
+    document.getElementById('success').classList.add('show');
+  }
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/klient", "destination": "/klient.html" },
     { "source": "/demo", "destination": "/demo.html" },
+    { "source": "/objednat", "destination": "/objednat.html" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
