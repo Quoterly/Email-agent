@@ -208,8 +208,8 @@
           <input type="text" id="f-name" placeholder="Jana Nováková" required />
         </div>
         <div class="field">
-          <label for="f-company">Název firmy *</label>
-          <input type="text" id="f-company" placeholder="Vaše s.r.o." required />
+          <label for="f-company">Název firmy <span class="opt">(nepovinné)</span></label>
+          <input type="text" id="f-company" placeholder="Vaše s.r.o." />
         </div>
         <div class="field">
           <label for="f-email">Email *</label>
@@ -252,26 +252,34 @@
 </footer>
 
 <script>
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
-    const name = document.getElementById('f-name').value;
-    const company = document.getElementById('f-company').value;
-    const email = document.getElementById('f-email').value;
-    const phone = document.getElementById('f-phone').value;
-    const note = document.getElementById('f-note').value;
+    const btn = e.target.querySelector('.btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Odesílám…';
 
-    const body = [
-      `Jméno: ${name}`,
-      `Firma: ${company}`,
-      `Email: ${email}`,
-      phone ? `Telefon: ${phone}` : '',
-      note ? `Poznámka: ${note}` : '',
-    ].filter(Boolean).join('\n');
+    const data = {
+      name: document.getElementById('f-name').value.trim(),
+      company: document.getElementById('f-company').value.trim(),
+      email: document.getElementById('f-email').value.trim(),
+      phone: document.getElementById('f-phone').value.trim(),
+      note: document.getElementById('f-note').value.trim(),
+    };
 
-    window.location.href = `mailto:info@wiseagent.cz?subject=Objednávka Wise Agent — ${encodeURIComponent(company)}&body=${encodeURIComponent(body)}`;
-
-    document.getElementById('order-form').style.display = 'none';
-    document.getElementById('success').classList.add('show');
+    try {
+      const res = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Chyba serveru');
+      document.getElementById('order-form').style.display = 'none';
+      document.getElementById('success').classList.add('show');
+    } catch {
+      btn.disabled = false;
+      btn.textContent = 'Odeslat objednávku →';
+      alert('Nepodařilo se odeslat formulář. Napište nám prosím přímo na info@wiseagent.cz');
+    }
   }
 </script>
 </body>
