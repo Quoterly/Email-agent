@@ -186,6 +186,15 @@
     display: inline-block;
   }
   .btn-primary:hover { background: #34A26B; transform: translateY(-1px); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.92); color: #0E2240;
+    padding: 13px 26px; border-radius: 8px;
+    font-size: 0.975rem; font-weight: 600;
+    border: none; cursor: pointer; text-decoration: none;
+    transition: background 0.15s, transform 0.12s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { background: #fff; transform: translateY(-1px); }
   .btn-ghost {
     color: #7A9DC0; font-size: 0.9rem; text-decoration: none;
     transition: color 0.15s;
@@ -395,9 +404,10 @@
       AI agent pro emailovou komunikaci
     </div>
     <h1>Vaši zákazníci dostanou<br>odpověď. <em>Vždy.</em></h1>
-    <p class="hero-sub">Wise Agent přečte příchozí emaily, připraví návrh odpovědi přizpůsobený vaší firmě a vy jej jedním klikem schválíte a odešlete.</p>
+    <p class="hero-sub">Každý den strávíte hodiny psaním emailů. Wise Agent to udělá za vás — vy jen schválíte a odešlete.</p>
     <div class="hero-actions">
       <a href="/demo" class="btn-primary">Chci vyzkoušet zdarma</a>
+      <a href="/objednat" class="btn-secondary">Chci rovnou začít →</a>
       <a href="#how" class="btn-ghost">Jak to funguje →</a>
     </div>
     <p class="hero-disclaimer">První měsíc <span>zdarma</span> &nbsp;·&nbsp; Žádná kreditní karta &nbsp;·&nbsp; Zrušení kdykoliv</p>
@@ -495,10 +505,6 @@
       <ul class="price-features">
         <li>
           <svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Neomezený počet zpracovaných emailů
-        </li>
-        <li>
-          <svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Napojení na vaši emailovou schránku (Gmail, Seznam…)
         </li>
         <li>
@@ -523,7 +529,10 @@
   <p class="eyebrow">Začněte dnes</p>
   <h2 class="section-h">Přestaňte řešit emaily.<br>Začněte podnikat.</h2>
   <p class="section-p">Wise Agent zvládne emailovou komunikaci za vás. Vy máte vždy poslední slovo.</p>
-  <a href="/demo" class="btn-primary">Chci vyzkoušet zdarma</a>
+  <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1rem">
+    <a href="/demo" class="btn-primary">Chci vyzkoušet zdarma</a>
+    <a href="/objednat" class="btn-secondary">Chci rovnou začít →</a>
+  </div>
   <p class="cta-note">nebo napište na <a href="mailto:info@wiseagent.cz">info@wiseagent.cz</a></p>
 </section>
 
