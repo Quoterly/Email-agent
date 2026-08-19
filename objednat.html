@@ -137,6 +137,17 @@
   .footer-links a { font-size: 0.82rem; color: #3A6080; text-decoration: none; transition: color 0.15s; }
   .footer-links a:hover { color: #7A9DC0; }
 
+  .security-note {
+    display: flex; gap: 8px; align-items: flex-start;
+    margin-top: 1.25rem; padding: 0.85rem 1rem;
+    background: var(--bg); border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--text3); line-height: 1.55;
+  }
+  .security-note strong { font-weight: 600; color: var(--text3); }
+  .security-note a { color: var(--text3); text-decoration: underline; text-underline-offset: 2px; }
+  .security-note a:hover { color: var(--text2); }
+
   @media (max-width: 700px) {
     .wrap { grid-template-columns: 1fr; gap: 2.5rem; }
     main { align-items: flex-start; }
@@ -226,6 +237,15 @@
 
         <button type="submit" class="btn-submit">Odeslat objednávku →</button>
         <p class="form-note">Odesláním souhlasíte se zpracováním osobních údajů za účelem kontaktování.</p>
+
+        <div class="security-note">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M6 1L1.5 3v3.5C1.5 9 3.5 11 6 11s4.5-2 4.5-4.5V3L6 1z"/></svg>
+          <div>
+            <strong>Bezpečnost vašich dat</strong><br>
+            Vaše data jsou uložena na serverech v EU (Frankfurt). Obsah emailů je zpracováván výhradně za účelem generování odpovědí prostřednictvím Anthropic API. Nikdo jiný k vašim emailům nemá přístup.
+            <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Anthropic Privacy Policy</a>
+          </div>
+        </div>
       </form>
 
       <div class="success" id="success">
