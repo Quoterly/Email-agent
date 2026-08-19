@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /klient
+Disallow: /api/
+
+Sitemap: https://www.wiseagent.cz/sitemap.xml
