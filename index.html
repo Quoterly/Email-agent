@@ -381,6 +381,29 @@
   }
   .toggle-pill.on .toggle-thumb { transform: translateX(22px); }
 
+  /* ── price grid ── */
+  .price-grid { max-width: 420px; margin: 0 auto; }
+  .price-card-title {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--text3); margin-bottom: 0.4rem;
+  }
+  .price-card--featured { border-color: var(--sage); }
+
+  @media (min-width: 768px) {
+    #billing-toggle-wrap { display: none !important; }
+    .price-grid {
+      max-width: 800px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    .price-grid .price-card { max-width: none; margin: 0; display: block !important; }
+    .price-grid .price-card:not(.price-card--featured) { border-color: var(--border); }
+  }
+  @media (max-width: 767px) {
+    #card-yearly { display: none; }
+    .pricing.yearly-mode #card-monthly { display: none; }
+    .pricing.yearly-mode #card-yearly { display: block; }
+  }
+
   /* ── cta band ── */
   .cta-band {
     background: #071629; text-align: center;
@@ -554,39 +577,41 @@
     <p class="eyebrow reveal">Ceník</p>
     <h2 class="section-h reveal">Jeden tarif. Bez překvapení.</h2>
     <p class="section-p reveal">Vše v jedné ceně — bez limitů počtu emailů, bez skrytých poplatků, bez ročního závazku.</p>
-    <div class="billing-toggle reveal">
+    <div class="billing-toggle reveal" id="billing-toggle-wrap">
       <span class="billing-opt active" id="opt-monthly">Měsíčně</span>
       <button class="toggle-pill" id="billing-toggle" role="switch" aria-checked="false"><span class="toggle-thumb"></span></button>
       <span class="billing-opt" id="opt-yearly">Ročně <span class="save-badge" id="save-badge">Ušetříte 17&nbsp;%</span></span>
     </div>
-    <div class="price-card reveal">
-      <div class="price-pill">První měsíc zdarma</div>
-      <div class="price-amount" id="price-amount"><sup>Kč</sup>990</div>
-      <p class="price-period" id="price-period">měsíčně</p>
-      <div class="price-highlight">Začněte zdarma — plaťte až od druhého měsíce</div>
-      <ul class="price-features">
-        <li>
-          <svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Napojení na vaši emailovou schránku (Gmail, Seznam…)
-        </li>
-        <li>
-          <svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Přizpůsobení tónu a stylu komunikace
-        </li>
-        <li>
-          <svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Emailová notifikace při nových návrzích
-        </li>
-        <li>
-          <svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Podpora v češtině
-        </li>
-        <li>
-          <svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Zrušení kdykoliv
-        </li>
-      </ul>
-      <a href="/objednat" class="btn-primary price-cta">Objednat</a>
+    <div class="price-grid">
+      <div class="price-card reveal" id="card-monthly">
+        <p class="price-card-title">Měsíčně</p>
+        <div class="price-amount"><sup>Kč</sup>990</div>
+        <p class="price-period">měsíčně</p>
+        <div class="price-highlight">Začněte zdarma — plaťte až od druhého měsíce</div>
+        <ul class="price-features">
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Napojení na vaši emailovou schránku (Gmail, Seznam…)</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Přizpůsobení tónu a stylu komunikace</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Emailová notifikace při nových návrzích</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Podpora v češtině</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Zrušení kdykoliv</li>
+        </ul>
+        <a href="/objednat" class="btn-primary price-cta">Objednat</a>
+      </div>
+      <div class="price-card price-card--featured reveal" id="card-yearly">
+        <div class="price-pill">Doporučujeme · Ušetříte 17 %</div>
+        <p class="price-card-title">Ročně</p>
+        <div class="price-amount"><sup>Kč</sup>9&nbsp;900</div>
+        <p class="price-period">ročně <span style="opacity:.7">(825 Kč / měsíc)</span></p>
+        <div class="price-highlight">Začněte zdarma — plaťte až od druhého měsíce</div>
+        <ul class="price-features">
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Napojení na vaši emailovou schránku (Gmail, Seznam…)</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Přizpůsobení tónu a stylu komunikace</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Emailová notifikace při nových návrzích</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Podpora v češtině</li>
+          <li><svg class="chk" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="currentColor" opacity="0.15"/><path d="M4 7.5l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Zrušení kdykoliv</li>
+        </ul>
+        <a href="/objednat" class="btn-primary price-cta">Objednat</a>
+      </div>
     </div>
   </div>
 </section>
@@ -634,8 +659,6 @@
   const billToggle = document.getElementById('billing-toggle');
   const optMonthly = document.getElementById('opt-monthly');
   const optYearly  = document.getElementById('opt-yearly');
-  const priceAmt   = document.getElementById('price-amount');
-  const pricePer   = document.getElementById('price-period');
   const saveBadge  = document.getElementById('save-badge');
 
   billToggle.addEventListener('click', function() {
@@ -645,13 +668,7 @@
     optMonthly.classList.toggle('active', !yearly);
     optYearly.classList.toggle('active', yearly);
     saveBadge.classList.toggle('visible', yearly);
-    if (yearly) {
-      priceAmt.innerHTML = '<sup>Kč</sup>9&nbsp;900';
-      pricePer.textContent = 'ročně (825 Kč / měsíc)';
-    } else {
-      priceAmt.innerHTML = '<sup>Kč</sup>990';
-      pricePer.textContent = 'měsíčně';
-    }
+    document.getElementById('pricing').classList.toggle('yearly-mode', yearly);
   });
 </script>
 <script type="application/ld+json">
