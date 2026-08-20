@@ -346,6 +346,41 @@
   .chk { color: var(--sage); flex-shrink: 0; }
   .price-cta { display: block; text-align: center; width: 100%; }
 
+  /* ── billing toggle ── */
+  .billing-toggle {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .billing-opt {
+    font-size: 0.9rem; color: var(--text3);
+    transition: color 0.2s; cursor: default;
+  }
+  .billing-opt.active { color: var(--text1); font-weight: 500; }
+  .save-badge {
+    background: var(--sage-bg); color: var(--sage);
+    font-size: 0.72rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+    letter-spacing: 0.02em; vertical-align: middle;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .save-badge.visible { opacity: 1; }
+  .toggle-pill {
+    width: 48px; height: 26px;
+    background: var(--border);
+    border: none; border-radius: 13px;
+    cursor: pointer; position: relative;
+    transition: background 0.25s; padding: 0; flex-shrink: 0;
+  }
+  .toggle-pill.on { background: var(--sage); }
+  .toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    background: #fff; border-radius: 50%;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+  .toggle-pill.on .toggle-thumb { transform: translateX(22px); }
+
   /* ── cta band ── */
   .cta-band {
     background: #071629; text-align: center;
@@ -519,10 +554,15 @@
     <p class="eyebrow reveal">Ceník</p>
     <h2 class="section-h reveal">Jeden tarif. Bez překvapení.</h2>
     <p class="section-p reveal">Vše v jedné ceně — bez limitů počtu emailů, bez skrytých poplatků, bez ročního závazku.</p>
+    <div class="billing-toggle reveal">
+      <span class="billing-opt active" id="opt-monthly">Měsíčně</span>
+      <button class="toggle-pill" id="billing-toggle" role="switch" aria-checked="false"><span class="toggle-thumb"></span></button>
+      <span class="billing-opt" id="opt-yearly">Ročně <span class="save-badge" id="save-badge">Ušetříte 17&nbsp;%</span></span>
+    </div>
     <div class="price-card reveal">
       <div class="price-pill">První měsíc zdarma</div>
-      <div class="price-amount"><sup>Kč</sup>990</div>
-      <p class="price-period">měsíčně</p>
+      <div class="price-amount" id="price-amount"><sup>Kč</sup>990</div>
+      <p class="price-period" id="price-period">měsíčně</p>
       <div class="price-highlight">Začněte zdarma — plaťte až od druhého měsíce</div>
       <ul class="price-features">
         <li>
@@ -589,6 +629,30 @@
     { threshold: 0.1 }
   );
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // billing toggle
+  const billToggle = document.getElementById('billing-toggle');
+  const optMonthly = document.getElementById('opt-monthly');
+  const optYearly  = document.getElementById('opt-yearly');
+  const priceAmt   = document.getElementById('price-amount');
+  const pricePer   = document.getElementById('price-period');
+  const saveBadge  = document.getElementById('save-badge');
+
+  billToggle.addEventListener('click', function() {
+    const yearly = !this.classList.contains('on');
+    this.classList.toggle('on', yearly);
+    this.setAttribute('aria-checked', yearly);
+    optMonthly.classList.toggle('active', !yearly);
+    optYearly.classList.toggle('active', yearly);
+    saveBadge.classList.toggle('visible', yearly);
+    if (yearly) {
+      priceAmt.innerHTML = '<sup>Kč</sup>9&nbsp;900';
+      pricePer.textContent = 'ročně (825 Kč / měsíc)';
+    } else {
+      priceAmt.innerHTML = '<sup>Kč</sup>990';
+      pricePer.textContent = 'měsíčně';
+    }
+  });
 </script>
 <script type="application/ld+json">
 {
