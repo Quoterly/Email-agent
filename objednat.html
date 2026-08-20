@@ -268,28 +268,28 @@
           <input type="tel" id="f-phone" placeholder="+420 600 000 000" />
         </div>
         <div class="field">
-          <label for="f-note">Poznámka <span class="opt">(nepovinné)</span></label>
-          <textarea id="f-note" placeholder="Počet emailů týdně, typ dotazů, emailový klient…"></textarea>
-        </div>
-
-        <div class="field">
           <label>Způsob platby</label>
           <div class="plan-options">
             <label class="plan-opt">
-              <input type="radio" name="plan" value="Měsíčně — 990 Kč/měsíc" checked>
+              <input type="radio" name="plan" id="plan-monthly" value="Měsíčně — 990 Kč/měsíc" checked>
               <span class="plan-text">
                 <span class="plan-name">Měsíčně</span>
                 <span class="plan-price">990 Kč / měsíc</span>
               </span>
             </label>
             <label class="plan-opt">
-              <input type="radio" name="plan" value="Ročně — 9 900 Kč/rok">
+              <input type="radio" name="plan" id="plan-yearly" value="Ročně — 9 900 Kč/rok">
               <span class="plan-text">
                 <span class="plan-name">Ročně <span class="plan-badge">Ušetříte 17 %</span></span>
                 <span class="plan-price">9 900 Kč / rok</span>
               </span>
             </label>
           </div>
+        </div>
+
+        <div class="field">
+          <label for="f-note">Poznámka <span class="opt">(nepovinné)</span></label>
+          <textarea id="f-note" placeholder="Počet emailů týdně, typ dotazů, emailový klient…"></textarea>
         </div>
 
         <button type="submit" class="btn-submit">Odeslat objednávku →</button>
@@ -320,6 +320,10 @@
 </footer>
 
 <script>
+  const tarif = new URLSearchParams(location.search).get('tarif');
+  if (tarif === 'rocni') document.getElementById('plan-yearly').checked = true;
+  if (tarif === 'mesicni') document.getElementById('plan-monthly').checked = true;
+
   async function submitForm(e) {
     e.preventDefault();
     const btn = e.target.querySelector('.btn-submit');
