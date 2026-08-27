@@ -340,18 +340,19 @@
     };
 
     try {
-      const res = await fetch('/api/order', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Chyba serveru');
+      const json = await res.json();
+      if (!json.success) throw new Error('Chyba serveru');
       document.getElementById('order-form').style.display = 'none';
       document.getElementById('success').classList.add('show');
     } catch {
       btn.disabled = false;
       btn.textContent = 'Odeslat objednávku →';
-      alert('Nepodařilo se odeslat formulář. Napište nám prosím přímo na info@wiseagent.cz');
+      alert('Něco se pokazilo, napište nám přímo na info@wiseagent.cz');
     }
   }
 </script>
