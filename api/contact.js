@@ -16,7 +16,7 @@ module.exports = async function handler(req, res) {
   ].filter(Boolean).join('\n');
 
   const transporter = nodemailer.createTransport({
-    host: 'smtp.wedos.net',
+    host: 'smtp.gmail.com',
     port: 465,
     secure: true,
     auth: {
