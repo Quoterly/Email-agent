@@ -104,7 +104,7 @@
     cursor: pointer; text-decoration: none;
     transition: background 0.15s;
   }
-  .nav-cta:hover { background: #34A26B; }
+  .nav-cta:hover { background: #34A26B; box-shadow: 0 0 16px rgba(46,204,113,0.55), 0 0 32px rgba(46,204,113,0.25); }
   .nav-order {
     color: #E4EDF7;
     border: 1px solid rgba(255,255,255,0.28);
@@ -204,10 +204,11 @@
     padding: 13px 26px; border-radius: 8px;
     font-size: 0.975rem; font-weight: 600;
     border: none; cursor: pointer; text-decoration: none;
+    transition: background 0.15s, transform 0.12s, box-shadow 0.3s ease;
     transition: background 0.15s, transform 0.12s;
     display: inline-block;
   }
-  .btn-primary:hover { background: #34A26B; transform: translateY(-1px); }
+  .btn-primary:hover { background: #34A26B; transform: translateY(-1px); box-shadow: 0 0 20px rgba(46,204,113,0.6), 0 0 40px rgba(46,204,113,0.25); }
   .btn-secondary {
     background: rgba(255,255,255,0.92); color: #0E2240;
     padding: 13px 26px; border-radius: 8px;
@@ -457,7 +458,7 @@
     <img src="/images/logo.svg" alt="Wise Agent" />
   </a>
   <div class="nav-right">
-    <a href="/demo" class="nav-order">Vyzkoušet zdarma</a>
+    <a href="/demo" class="nav-order">Vyzkoušet DEMO</a>
     <a href="/objednat" class="nav-cta">Objednat</a>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
       <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
@@ -488,7 +489,7 @@
     <h1>Vaši zákazníci dostanou<br>odpověď. <em>Vždy.</em></h1>
     <p class="hero-sub">Každý den strávíte hodiny psaním emailů. Wise Agent to udělá za vás — vy jen schválíte a odešlete.</p>
     <div class="hero-actions">
-      <a href="/demo" class="btn-primary">Chci vyzkoušet zdarma</a>
+      <a href="/demo" class="btn-primary">Chci vyzkoušet DEMO</a>
       <a href="#how" class="btn-ghost">Jak to funguje →</a>
     </div>
   </div>
