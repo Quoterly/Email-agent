@@ -1,0 +1,19 @@
+# Wise Agent
+
+> AI email agent pro české malé a střední firmy. Automaticky navrhuje odpovědi na příchozí emaily — vy jen schválíte a odešlete.
+
+## Služba
+
+- Cena: 990 Kč/měsíc nebo 9 900 Kč/rok
+- První měsíc zdarma
+- Bez závazku, zrušení kdykoliv
+
+## Stránky
+
+- [Hlavní stránka](https://wiseagent.cz/)
+- [Demo konfigurátor](https://wiseagent.cz/demo)
+- [Objednávka](https://wiseagent.cz/objednat)
+
+## Kontakt
+
+- Email: info@wiseagent.cz
