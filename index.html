@@ -142,19 +142,8 @@
   .nav-dropdown a:last-child { border-bottom: none; }
   .nav-dropdown a:hover { background: rgba(255,255,255,0.07); }
   .nav-dropdown svg { flex-shrink: 0; opacity: 0.6; }
-  .dropdown-actions {
-    display: flex; flex-direction: column; gap: 0.5rem;
-    padding: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .dropdown-actions a {
-    display: block; text-align: center; border-radius: 6px;
-    font-size: 0.875rem; font-weight: 500; text-decoration: none;
-    padding: 9px 16px; border-bottom: none; transition: background 0.15s, border-color 0.15s;
-  }
-  .dropdown-actions .nav-cta { background: #267A52; color: #fff; }
-  .dropdown-actions .nav-cta:hover { background: #34A26B; }
-  .dropdown-actions .nav-order { color: #E4EDF7; border: 1px solid rgba(255,255,255,0.28); background: none; }
-  .dropdown-actions .nav-order:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.5); }
+  .dropdown-order { color: #3DC87A !important; }
+  .dropdown-order svg { stroke: #3DC87A; }
 
   /* ── hero ── */
   .hero {
@@ -492,10 +481,14 @@
       </svg>
     </button>
     <div class="nav-dropdown" id="nav-dropdown" role="menu">
-      <div class="dropdown-actions">
-        <a href="/objednat" class="nav-cta" role="menuitem">Objednat</a>
-        <a href="/demo" class="nav-order" role="menuitem">Vyzkoušet DEMO</a>
-      </div>
+      <a href="/objednat" role="menuitem" class="dropdown-order">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="1.5" width="10" height="12" rx="1.5"/><path d="M5 5h5M5 7.5h5M5 10h3"/></svg>
+        Objednat
+      </a>
+      <a href="/demo" role="menuitem">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="6.5"/><path d="M6 5.5v4l4.5-2L6 5.5z" fill="currentColor" stroke="none"/></svg>
+        Vyzkoušet DEMO
+      </a>
       <a href="/klient" role="menuitem">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="13" height="10" rx="1.5"/><path d="M1 5.5l6.5 4 6.5-4"/></svg>
         Klientský portál
