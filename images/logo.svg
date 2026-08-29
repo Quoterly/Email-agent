@@ -1,14 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" role="img" aria-label="WiseAgent">
   <title>WiseAgent</title>
-  <style>
-    @media (prefers-color-scheme: dark) {
-      .w { fill: #D0E4F7 }
-      .a { fill: #7AAFDF }
-    }
-  </style>
   <text x="2" y="32"
     font-family="system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
     font-size="28" font-weight="700" letter-spacing="-0.5">
-    <tspan class="w" fill="#0E2240">Wise</tspan><tspan class="a" fill="#2563A8">Agent</tspan><tspan fill="#34C87A">.</tspan>
+    <tspan fill="#D0E4F7">Wise</tspan><tspan fill="#7AAFDF">Agent</tspan><tspan fill="#34C87A">.</tspan>
   </text>
 </svg>
