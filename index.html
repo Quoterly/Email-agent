@@ -411,11 +411,11 @@
     padding: clamp(4.5rem, 9vw, 7rem) clamp(1.5rem, 5vw, 4rem);
     scroll-margin-top: 60px;
   }
-  .cta-band .eyebrow { color: rgba(61,200,122,0.65); margin-bottom: 0.75rem; }
+  .cta-band .eyebrow { color: #3DC87A; margin-bottom: 0.75rem; }
   .cta-band .section-h { color: #E4EDF7; max-width: 580px; margin: 0 auto 0.9rem; }
   .cta-band .section-p { color: #7A9DC0; margin: 0 auto 2.25rem; }
   .cta-band .btn-primary { font-size: 1.05rem; padding: 14px 32px; }
-  .cta-note { margin-top: 1.1rem; font-size: 0.82rem; color: #3A6080; }
+  .cta-note { margin-top: 1.1rem; font-size: 0.82rem; color: #7A9DC0; }
   .cta-note a { color: #3DC87A; text-decoration: none; }
   .cta-note a:hover { text-decoration: underline; }
 
@@ -427,14 +427,14 @@
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 1rem;
   }
-  .footer-brand { font-size: 0.82rem; color: #3A6080; display: flex; align-items: center; gap: 0.6rem; }
-  .footer-brand span { color: #3A6080; }
+  .footer-brand { font-size: 0.82rem; color: #cccccc; display: flex; align-items: center; gap: 0.6rem; }
+  .footer-brand span { color: #cccccc; }
   .footer-links { display: flex; gap: 1.5rem; }
   .footer-links a {
-    font-size: 0.82rem; color: #3A6080;
+    font-size: 0.82rem; color: #cccccc;
     text-decoration: none; transition: color 0.15s;
   }
-  .footer-links a:hover { color: #7A9DC0; }
+  .footer-links a:hover { color: #E4EDF7; }
 
   /* ── reveal ── */
   .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
@@ -480,6 +480,7 @@
   </div>
 </nav>
 
+<main role="main">
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-badge">
@@ -580,7 +581,7 @@
     <p class="section-p reveal">Vyberte si způsob platby který vám vyhovuje. Zrušení kdykoliv.</p>
     <div class="billing-toggle reveal" id="billing-toggle-wrap">
       <span class="billing-opt active" id="opt-monthly">Měsíčně</span>
-      <button class="toggle-pill" id="billing-toggle" role="switch" aria-checked="false"><span class="toggle-thumb"></span></button>
+      <button class="toggle-pill" id="billing-toggle" role="switch" aria-checked="false" aria-label="Přepnout mezi měsíční a roční platbou"><span class="toggle-thumb"></span></button>
       <span class="billing-opt" id="opt-yearly">Ročně <span class="save-badge" id="save-badge">Ušetříte 17&nbsp;%</span></span>
     </div>
     <div class="price-grid">
@@ -624,6 +625,7 @@
   <a href="/objednat" class="btn-primary">Vyplňte formulář</a>
   <p class="cta-note">nebo napište na <a href="mailto:info@wiseagent.cz">info@wiseagent.cz</a></p>
 </section>
+</main>
 
 <footer>
   <div class="footer-brand"><img src="/images/logo.svg" alt="Wise Agent" style="height:28px;display:block"><span>AI asistent pro emailovou komunikaci</span></div>
