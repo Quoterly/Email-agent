@@ -11,6 +11,8 @@
     { "source": "/demo", "destination": "/demo.html" },
     { "source": "/objednat", "destination": "/objednat.html" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/favicon.ico", "destination": "/favicon.png" },
+    { "source": "/favicon.png", "destination": "/favicon.png" },
     { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
     { "source": "/robots.txt", "destination": "/robots.txt" },
     { "source": "/(.*)", "destination": "/index.html" }
