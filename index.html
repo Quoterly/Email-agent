@@ -403,6 +403,13 @@
     #card-yearly { display: none; }
     .pricing.yearly-mode #card-monthly { display: none; }
     .pricing.yearly-mode #card-yearly { display: block; }
+    #billing-toggle-wrap {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .billing-toggle-row {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    #save-badge { text-align: center; margin-bottom: 0.5rem; }
   }
 
   /* ── cta band ── */
@@ -580,9 +587,12 @@
     <h2 class="section-h reveal">Transparentní cena. Žádná překvapení.</h2>
     <p class="section-p reveal">Vyberte si způsob platby který vám vyhovuje. Zrušení kdykoliv.</p>
     <div class="billing-toggle reveal" id="billing-toggle-wrap">
-      <span class="billing-opt active" id="opt-monthly">Měsíčně</span>
-      <button class="toggle-pill" id="billing-toggle" role="switch" aria-checked="false" aria-label="Přepnout mezi měsíční a roční platbou"><span class="toggle-thumb"></span></button>
-      <span class="billing-opt" id="opt-yearly">Ročně <span class="save-badge" id="save-badge">Ušetříte 17&nbsp;%</span></span>
+      <span class="save-badge" id="save-badge">Ušetříte 17&nbsp;%</span>
+      <div class="billing-toggle-row">
+        <span class="billing-opt active" id="opt-monthly">Měsíčně</span>
+        <button class="toggle-pill" id="billing-toggle" role="switch" aria-checked="false" aria-label="Přepnout mezi měsíční a roční platbou"><span class="toggle-thumb"></span></button>
+        <span class="billing-opt" id="opt-yearly">Ročně</span>
+      </div>
     </div>
     <div class="price-grid">
       <div class="price-card reveal" id="card-monthly">
