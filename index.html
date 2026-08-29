@@ -449,12 +449,16 @@
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
 
   /* ── responsive ── */
+  @media (max-width: 767px) {
+    nav .nav-cta { display: none; }
+    nav .nav-order { display: none; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .hero-actions .nav-order { display: block; width: 100%; text-align: center; box-sizing: border-box; }
+  }
   @media (max-width: 640px) {
     .steps { grid-template-columns: 1fr; gap: 2.5rem; }
     .steps::before { display: none; }
     .benefits-grid { grid-template-columns: 1fr; }
-    .nav-cta { display: none; }
-    .nav-order { display: none; }
   }
 </style>
 </head>
@@ -475,6 +479,14 @@
       </svg>
     </button>
     <div class="nav-dropdown" id="nav-dropdown" role="menu">
+      <a href="/demo" role="menuitem">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="6.5"/><path d="M6 5.5v4l4.5-2L6 5.5z" fill="currentColor" stroke="none"/></svg>
+        Vyzkoušet DEMO
+      </a>
+      <a href="/objednat" role="menuitem">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="1.5" width="10" height="12" rx="1.5"/><path d="M5 5h5M5 7.5h5M5 10h3"/></svg>
+        Objednat
+      </a>
       <a href="/klient" role="menuitem">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="13" height="10" rx="1.5"/><path d="M1 5.5l6.5 4 6.5-4"/></svg>
         Klientský portál
