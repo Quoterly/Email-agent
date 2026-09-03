@@ -59,8 +59,13 @@ nav {
   cursor: pointer; text-decoration: none; transition: background 0.15s, border-color 0.15s;
 }
 .nav-order:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.5); }
-.nav-blog { color: #94A3B8; font-size: 0.85rem; font-weight: 500; text-decoration: none; transition: color 0.15s; }
-.nav-blog:hover { color: #E4EDF7; }
+.nav-blog {
+  color: #94A3B8; font-size: 0.85rem; font-weight: 500;
+  text-decoration: none; padding: 6px 16px; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.22); margin-right: 0.25rem;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.nav-blog:hover { color: #E4EDF7; border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.06); }
 .nav-hamburger {
   background: none; border: none; cursor: pointer; color: #E4EDF7;
   padding: 6px; display: flex; align-items: center;
