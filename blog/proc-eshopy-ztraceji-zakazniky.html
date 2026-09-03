@@ -206,6 +206,13 @@ main { padding-top: 60px; }
   display: inline-block; transition: background 0.15s, box-shadow 0.3s;
 }
 .btn-primary:hover { background: #34A26B; box-shadow: 0 0 20px rgba(46,204,113,0.5); }
+.btn-order {
+  color: #E4EDF7; border: 1px solid rgba(255,255,255,0.3); background: none;
+  padding: 13px 28px; border-radius: 8px; font-size: 1rem; font-weight: 600;
+  text-decoration: none; display: inline-block;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-order:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.55); }
 
 /* ── footer ── */
 footer {
@@ -347,7 +354,10 @@ footer {
     <p class="eyebrow">AI email agent pro váš e-shop</p>
     <h2>Odpověď i v neděli večer.</h2>
     <p>Wise Agent čte příchozí emaily, připraví návrh odpovědi přizpůsobený stylu vaší firmy — a vy ji jedním klikem schválíte a odešlete. První měsíc zdarma.</p>
-    <a href="/demo" class="btn-primary">Vyzkoušet DEMO</a>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="/demo" class="btn-primary">Vyzkoušet DEMO</a>
+      <a href="/objednat" class="btn-order">Objednat</a>
+    </div>
   </section>
 </main>
 
