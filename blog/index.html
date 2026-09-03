@@ -144,6 +144,7 @@ footer {
 .footer-links a { font-size: 0.82rem; color: #cccccc; text-decoration: none; transition: color 0.15s; }
 .footer-links a:hover { color: #E4EDF7; }
 
+@media (min-width: 768px) { .mobile-only { display: none !important; } }
 @media (max-width: 767px) {
   .nav-right > .nav-cta { display: none; }
   .nav-right > .nav-order { display: none; }
@@ -170,15 +171,15 @@ footer {
       </svg>
     </button>
     <div class="nav-dropdown" id="nav-dropdown" role="menu">
-      <a href="/objednat" role="menuitem" class="dropdown-order">
+      <a href="/objednat" role="menuitem" class="dropdown-order mobile-only">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="1.5" width="10" height="12" rx="1.5"/><path d="M5 5h5M5 7.5h5M5 10h3"/></svg>
         Objednat
       </a>
-      <a href="/demo" role="menuitem">
+      <a href="/demo" role="menuitem" class="mobile-only">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="6.5"/><path d="M6 5.5v4l4.5-2L6 5.5z" fill="currentColor" stroke="none"/></svg>
         Vyzkoušet DEMO
       </a>
-      <a href="/blog" role="menuitem">
+      <a href="/blog" role="menuitem" class="mobile-only">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h11M2 6h11M2 9h7"/></svg>
         Blog
       </a>
@@ -200,6 +201,18 @@ footer {
     <p>Tipy a poznatky o emailové komunikaci a zákaznické péči.</p>
   </div>
   <div class="blog-grid">
+    <a href="/blog/ai-zakaznicka-podpora" class="blog-card">
+      <p class="blog-card-tag">Zákaznická péče</p>
+      <h2>AI v zákaznické podpoře: jak to funguje a proč se nebát</h2>
+      <p>9 z 10 českých firem počítá s AI. Co to v praxi znamená pro e-shopy a malé firmy — a jak začít bez rizika.</p>
+      <p class="blog-card-meta">Září 2026 · 6 minut čtení</p>
+    </a>
+    <a href="/blog/emaily-ztraty-casu" class="blog-card">
+      <p class="blog-card-tag">Produktivita</p>
+      <h2>Kolik hodin týdně ztrácíte psaním emailů zákazníkům</h2>
+      <p>Průměrný pracovník tráví emailem 11 hodin týdně. Co to stojí v penězích a jak si tento čas vrátit zpět.</p>
+      <p class="blog-card-meta">Září 2026 · 5 minut čtení</p>
+    </a>
     <a href="/blog/proc-eshopy-ztraceji-zakazniky" class="blog-card">
       <p class="blog-card-tag">E-commerce</p>
       <h2>Proč e-shopy ztrácejí zákazníky kvůli pomalým emailovým odpovědím</h2>
