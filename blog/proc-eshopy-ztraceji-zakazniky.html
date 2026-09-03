@@ -75,8 +75,14 @@ nav {
   transition: background 0.15s, border-color 0.15s;
 }
 .nav-order:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.5); }
-.nav-blog { color: #94A3B8; font-size: 0.85rem; font-weight: 500; text-decoration: none; transition: color 0.15s; }
-.nav-blog:hover { color: #E4EDF7; }
+.nav-blog {
+  color: #94A3B8; font-size: 0.85rem; font-weight: 500;
+  text-decoration: none; padding: 6px 16px; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.22); margin-right: 0.25rem;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.nav-blog:hover { color: #E4EDF7; border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.06); }
+@media (min-width: 768px) { .mobile-only { display: none !important; } }
 .nav-hamburger {
   background: none; border: none; cursor: pointer; color: #E4EDF7;
   padding: 6px; display: flex; align-items: center;
@@ -252,11 +258,11 @@ footer {
       </svg>
     </button>
     <div class="nav-dropdown" id="nav-dropdown" role="menu">
-      <a href="/objednat" role="menuitem" class="dropdown-order">
+      <a href="/objednat" role="menuitem" class="dropdown-order mobile-only">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="1.5" width="10" height="12" rx="1.5"/><path d="M5 5h5M5 7.5h5M5 10h3"/></svg>
         Objednat
       </a>
-      <a href="/demo" role="menuitem">
+      <a href="/demo" role="menuitem" class="mobile-only">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="6.5"/><path d="M6 5.5v4l4.5-2L6 5.5z" fill="currentColor" stroke="none"/></svg>
         Vyzkoušet DEMO
       </a>
@@ -355,8 +361,8 @@ footer {
     <h2>Odpověď i v neděli večer.</h2>
     <p>Wise Agent čte příchozí emaily, připraví návrh odpovědi přizpůsobený stylu vaší firmy — a vy ji jedním klikem schválíte a odešlete. První měsíc zdarma.</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-      <a href="/demo" class="btn-primary">Vyzkoušet DEMO</a>
-      <a href="/objednat" class="btn-order">Objednat</a>
+      <a href="/objednat" class="btn-primary">Objednat</a>
+      <a href="/demo" class="btn-order">Vyzkoušet DEMO</a>
     </div>
   </section>
 </main>
