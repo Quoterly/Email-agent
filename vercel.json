@@ -10,6 +10,7 @@
     { "source": "/klient", "destination": "/klient.html" },
     { "source": "/demo", "destination": "/demo.html" },
     { "source": "/objednat", "destination": "/objednat.html" },
+    { "source": "/blog", "destination": "/blog/index.html" },
     { "source": "/blog/proc-eshopy-ztraceji-zakazniky", "destination": "/blog/proc-eshopy-ztraceji-zakazniky.html" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/favicon.ico", "destination": "/favicon.png" },

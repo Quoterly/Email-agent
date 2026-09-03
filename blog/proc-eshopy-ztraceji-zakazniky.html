@@ -75,6 +75,8 @@ nav {
   transition: background 0.15s, border-color 0.15s;
 }
 .nav-order:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.5); }
+.nav-blog { color: #94A3B8; font-size: 0.85rem; font-weight: 500; text-decoration: none; transition: color 0.15s; }
+.nav-blog:hover { color: #E4EDF7; }
 .nav-hamburger {
   background: none; border: none; cursor: pointer; color: #E4EDF7;
   padding: 6px; display: flex; align-items: center;
@@ -232,6 +234,7 @@ footer {
     <img src="/images/logo.svg" alt="Wise Agent" loading="eager" />
   </a>
   <div class="nav-right">
+    <a href="/blog" class="nav-blog">Blog</a>
     <a href="/demo" class="nav-order">Vyzkoušet DEMO</a>
     <a href="/objednat" class="nav-cta">Objednat</a>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
