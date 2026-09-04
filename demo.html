@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-theme="light">
+<html lang="cs" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -101,18 +101,6 @@ nav {
   transition: color 0.15s;
 }
 .nav-back:hover { color: #E4EDF7; }
-.theme-btn {
-  width: 32px; height: 32px;
-  border-radius: 7px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  color: #7A9DC0;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
-.theme-btn:hover { background: rgba(255,255,255,0.12); color: #E4EDF7; }
-.theme-btn svg { width: 15px; height: 15px; }
 
 /* ── main content ── */
 main {
@@ -384,18 +372,6 @@ footer {
       </svg>
       Zpět
     </a>
-    <button class="theme-btn" onclick="toggleTheme()" title="Přepnout světlý/tmavý režim">
-      <svg id="theme-icon-light" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-        <circle cx="8" cy="8" r="3"/>
-        <line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/>
-        <line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/>
-        <line x1="3" y1="3" x2="4.1" y2="4.1"/><line x1="11.9" y1="11.9" x2="13" y2="13"/>
-        <line x1="13" y1="3" x2="11.9" y2="4.1"/><line x1="4.1" y1="11.9" x2="3" y2="13"/>
-      </svg>
-      <svg id="theme-icon-dark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none">
-        <path d="M13.5 10.5A6 6 0 015.5 2.5a6 6 0 108 8z"/>
-      </svg>
-    </button>
   </div>
 </nav>
 
@@ -702,24 +678,6 @@ function toggleCustomIndustry(selectId, inputId) {
   input.style.display = isOther ? 'block' : 'none';
   if (isOther) input.focus();
 }
-
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('theme-icon-light').style.display = isDark ? 'block' : 'none';
-  document.getElementById('theme-icon-dark').style.display = isDark ? 'none' : 'block';
-  localStorage.setItem('ea_theme', isDark ? 'light' : 'dark');
-}
-
-(function initTheme() {
-  const saved = localStorage.getItem('ea_theme');
-  if (saved === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    document.getElementById('theme-icon-light').style.display = 'none';
-    document.getElementById('theme-icon-dark').style.display = 'block';
-  }
-})();
 
 const examples = {
   reklamace: { subject: 'Reklamace televize LG 55"', body: 'Dobrý den, zakoupil jsem u vás televizi LG 55" před 3 měsíci a nyní se na obrazovce objevily černé pruhy. Chci uplatnit reklamaci. Jak mám postupovat? Máte pobočku v Praze?' },

@@ -37,7 +37,7 @@ module.exports = async function handler(req, res) {
       from: process.env.CONTACT_EMAIL,
       to: email,
       subject: 'Wise Agent — obdrželi jsme váš dotaz',
-      text: `Dobrý den ${name},\n\nděkujeme za váš zájem o Wise Agent. Váš dotaz jsme obdrželi a ozveme se vám do 24 hodin.\n\nMezitím si můžete vyzkoušet naše demo na wiseagent.cz/demo.\n\nS pozdravem\nTým Wise Agent\ninfo@wiseagent.cz | wiseagent.cz`,
+      text: `Dobrý den,\n\nděkujeme za váš zájem o Wise Agent. Váš dotaz jsme obdrželi a ozveme se vám do 24 hodin.\n\nMezitím si můžete vyzkoušet naše demo na wiseagent.cz/demo.\n\nS pozdravem\nTým Wise Agent\ninfo@wiseagent.cz | wiseagent.cz`,
     });
   } catch (_) {}
 
