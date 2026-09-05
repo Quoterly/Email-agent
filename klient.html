@@ -249,19 +249,17 @@ let clientSettings = {
 
 const clerkPublishableKey = 'pk_live_Y2xlcmsud2lzZWFnZW50LmN6JA';
 
-async function loadClerkScript() {
-  return new Promise((resolve, reject) => {
+async function initClerk() {
+  await new Promise((resolve, reject) => {
     const s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+    s.dataset.clerkPublishableKey = clerkPublishableKey;
+    s.crossOrigin = 'anonymous';
     s.onload = resolve;
     s.onerror = reject;
     document.head.appendChild(s);
   });
-}
-
-async function initClerk() {
-  await loadClerkScript();
-  clerk = new window.Clerk(clerkPublishableKey);
+  clerk = window.Clerk;
   await clerk.load({ afterSignInUrl: '/klient', afterSignUpUrl: '/klient' });
   if (clerk.user) {
     showApp();
