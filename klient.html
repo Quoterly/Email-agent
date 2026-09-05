@@ -259,14 +259,22 @@ async function initClerk() {
   try {
     await new Promise((resolve, reject) => {
       const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
+      // Load from Clerk's own verified CDN (clerk.wiseagent.cz); auto-creates window.Clerk as instance
+      s.src = 'https://clerk.wiseagent.cz/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
+      s.dataset.clerkPublishableKey = clerkPublishableKey;
       s.crossOrigin = 'anonymous';
       s.onload = resolve;
       s.onerror = reject;
       document.head.appendChild(s);
     });
-    clerk = new window.Clerk(clerkPublishableKey);
+    clerk = window.Clerk; // instance, not constructor
     await clerk.load();
+    clerk.addListener(({ user }) => {
+      if (user && document.getElementById('clerk-signin').style.display !== 'none') {
+        document.getElementById('clerk-signin').style.display = 'none';
+        showApp();
+      }
+    });
     loading.style.display = 'none';
     if (clerk.user) {
       showApp();
