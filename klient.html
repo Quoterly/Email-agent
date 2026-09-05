@@ -248,10 +248,10 @@ let clientSettings = {
   }
 })();
 
+const clerkPublishableKey = 'pk_live_Y2xlcmsud2lzZWFnZW50LmN6JA';
+
 async function initClerk() {
-  const res = await fetch('/api/config');
-  const { publishableKey } = await res.json();
-  clerk = new Clerk(publishableKey);
+  clerk = new Clerk(clerkPublishableKey);
   await clerk.load({ afterSignInUrl: '/klient', afterSignUpUrl: '/klient' });
   if (clerk.user) {
     showApp();
