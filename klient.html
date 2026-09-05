@@ -8,7 +8,6 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
-<script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 [data-theme="light"]{--bg:#f2f1ed;--surface:#fff;--surface2:#f7f6f3;--surface3:#eeecea;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#141413;--text2:#5c5b56;--text3:#9a9891;--accent:#1a56a4;--accent-light:#e8f0fb;--accent-text:#1a56a4;--green:#186636;--green-bg:#e8f5ee;--warn-bg:#fef7e8;--warn-text:#7a5800;--danger:#b02c2c;--danger-bg:#fdeeed;--shadow:0 1px 3px rgba(0,0,0,0.07),0 0 0 1px rgba(0,0,0,0.05)}
@@ -250,8 +249,19 @@ let clientSettings = {
 
 const clerkPublishableKey = 'pk_live_Y2xlcmsud2lzZWFnZW50LmN6JA';
 
+async function loadClerkScript() {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
 async function initClerk() {
-  clerk = new Clerk(clerkPublishableKey);
+  await loadClerkScript();
+  clerk = new window.Clerk(clerkPublishableKey);
   await clerk.load({ afterSignInUrl: '/klient', afterSignUpUrl: '/klient' });
   if (clerk.user) {
     showApp();
