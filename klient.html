@@ -8,6 +8,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
+<script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 [data-theme="light"]{--bg:#f2f1ed;--surface:#fff;--surface2:#f7f6f3;--surface3:#eeecea;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#141413;--text2:#5c5b56;--text3:#9a9891;--accent:#1a56a4;--accent-light:#e8f0fb;--accent-text:#1a56a4;--green:#186636;--green-bg:#e8f5ee;--warn-bg:#fef7e8;--warn-text:#7a5800;--danger:#b02c2c;--danger-bg:#fdeeed;--shadow:0 1px 3px rgba(0,0,0,0.07),0 0 0 1px rgba(0,0,0,0.05)}
@@ -109,30 +110,9 @@ input[type=password]:focus,input[type=email]:focus,input[type=text]:focus{border
 </head>
 <body>
 
-<!-- Login screen -->
-<div class="login-wrap" id="login-screen" style="display:none">
-  <div class="login-box">
-    <div>
-      <img src="/images/logo.svg" alt="Wise Agent" style="height:32px;display:block;margin-bottom:4px">
-      <div style="font-size:13px;color:var(--text3);margin-top:4px;">Přihlášení klienta</div>
-    </div>
-    <div class="field">
-      <label>E-mail</label>
-      <input type="email" id="login-email" placeholder="vas@email.cz" onkeydown="if(event.key==='Enter')login()" autofocus />
-    </div>
-    <div class="field">
-      <label>Heslo</label>
-      <div class="pw-wrap">
-        <input type="password" id="login-pw" placeholder="Zadejte heslo..." onkeydown="if(event.key==='Enter')login()" style="padding-right:36px" />
-        <button class="pw-toggle" type="button" onclick="togglePw('login-pw',this)" tabindex="-1">
-          <svg class="eye-on" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/></svg>
-          <svg class="eye-off" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z"/><circle cx="7" cy="7" r="1.5"/><line x1="2" y1="2" x2="12" y2="12"/></svg>
-        </button>
-      </div>
-    </div>
-    <div class="login-error" id="login-err">Nesprávné heslo</div>
-    <button class="btn btn-primary" style="width:100%" onclick="login()">Přihlásit se</button>
-  </div>
+<!-- Clerk sign-in screen -->
+<div class="login-wrap" id="clerk-signin" style="display:none">
+  <div id="clerk-signin-mount"></div>
 </div>
 
 <!-- Main app -->
@@ -246,9 +226,19 @@ input[type=password]:focus,input[type=email]:focus,input[type=text]:focus{border
 
 
 <script>
-let allEmails = [], currentFilter = 'all', clientPassword = '', clientEmail = '';
+let clerk;
+let allEmails = [], currentFilter = 'all';
+let clientSettings = {
+  tone: 'přátelský a profesionální',
+  replyLength: 'stredni',
+  usePlural: true,
+  useSignature: true,
+  ignoreKeywords: '',
+  ignoreSenders: '',
+  ignoreDomains: '',
+};
 
-// Apply saved theme + restore session immediately
+// Restore saved theme
 (function () {
   const t = localStorage.getItem('ea_theme');
   if (t === 'dark') {
@@ -256,75 +246,43 @@ let allEmails = [], currentFilter = 'all', clientPassword = '', clientEmail = ''
     document.getElementById('ti-l').style.display = 'none';
     document.getElementById('ti-d').style.display = 'block';
   }
-
-  const savedPw = sessionStorage.getItem('ea_client_pw');
-  const savedEmail = sessionStorage.getItem('ea_client_email');
-  if (savedPw && savedEmail) {
-    clientPassword = savedPw;
-    clientEmail = savedEmail;
-    initApp();
-  } else {
-    document.getElementById('login-screen').style.display = 'flex';
-  }
 })();
 
-function togglePw(id, btn) {
-  const inp = document.getElementById(id);
-  const show = inp.type === 'password';
-  inp.type = show ? 'text' : 'password';
-  btn.querySelector('.eye-on').style.display = show ? 'none' : '';
-  btn.querySelector('.eye-off').style.display = show ? '' : 'none';
-}
-
-async function login() {
-  const email = document.getElementById('login-email').value.trim();
-  const pw = document.getElementById('login-pw').value;
-  if (!email || !pw) return;
-  const errEl = document.getElementById('login-err');
-  errEl.style.display = 'none';
-  try {
-    const res = await fetch('/api/client-auth', { headers: { 'x-client-password': pw, 'x-client-email': email } });
-    if (!res.ok) { errEl.style.display = 'block'; return; }
-    const data = await res.json();
-    clientPassword = pw;
-    clientEmail = email;
-    sessionStorage.setItem('ea_client_pw', pw);
-    sessionStorage.setItem('ea_client_email', email);
-    showApp(data);
-  } catch (e) {
-    errEl.textContent = 'Chyba připojení: ' + e.message;
-    errEl.style.display = 'block';
+async function initClerk() {
+  const res = await fetch('/api/config');
+  const { publishableKey } = await res.json();
+  clerk = new Clerk(publishableKey);
+  await clerk.load({ afterSignInUrl: '/klient', afterSignUpUrl: '/klient' });
+  if (clerk.user) {
+    showApp();
+  } else {
+    document.getElementById('clerk-signin').style.display = 'flex';
+    clerk.mountSignIn(document.getElementById('clerk-signin-mount'));
   }
 }
 
-async function initApp() {
-  try {
-    const res = await fetch('/api/client-auth', { headers: { 'x-client-password': clientPassword, 'x-client-email': clientEmail } });
-    if (!res.ok) { logout(); return; }
-    const data = await res.json();
-    showApp(data);
-  } catch {
-    logout();
-  }
-}
-
-let clientSettings = {};
-
-function showApp(data) {
-  document.getElementById('company-name').textContent = data.companyName || 'Email Agent';
-  document.getElementById('login-screen').style.display = 'none';
+function showApp() {
+  document.getElementById('clerk-signin').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  clientSettings = {
-    tone: data.tone || 'přátelský a profesionální',
-    replyLength: data.replyLength || 'stredni',
-    usePlural: data.usePlural !== false,
-    useSignature: data.useSignature !== false,
-    ignoreKeywords: data.ignoreKeywords || '',
-    ignoreSenders: data.ignoreSenders || '',
-    ignoreDomains: data.ignoreDomains || '',
-  };
   renderSettings();
   loadEmails();
+}
+
+async function getToken() {
+  const token = await clerk.session.getToken();
+  return { 'Authorization': `Bearer ${token}` };
+}
+
+async function logout() {
+  await clerk.signOut({ redirectUrl: '/klient' });
+}
+
+function toggleTheme() {
+  const d = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', d ? 'light' : 'dark');
+  document.getElementById('ti-l').style.display = d ? 'block' : 'none';
+  document.getElementById('ti-d').style.display = d ? 'none' : 'block';
+  localStorage.setItem('ea_theme', d ? 'light' : 'dark');
 }
 
 function renderSettings() {
@@ -366,7 +324,7 @@ async function saveSettings() {
   try {
     const res = await fetch('/api/clients', {
       method: 'PATCH',
-      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      headers: { ...(await getToken()), 'Content-Type': 'application/json' },
       body: JSON.stringify(clientSettings),
     });
     if (!res.ok) throw new Error((await res.json()).error);
@@ -377,40 +335,12 @@ async function saveSettings() {
   }
 }
 
-function getAuthHeaders() {
-  return { 'x-client-password': clientPassword, 'x-client-email': clientEmail };
-}
-
-function logout() {
-  clientPassword = '';
-  clientEmail = '';
-  sessionStorage.removeItem('ea_client_pw');
-  sessionStorage.removeItem('ea_client_email');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  const emailEl = document.getElementById('login-email');
-  if (emailEl) { emailEl.value = ''; }
-  const pw = document.getElementById('login-pw');
-  if (pw) { pw.value = ''; }
-  const err = document.getElementById('login-err');
-  if (err) { err.style.display = 'none'; err.textContent = 'Nesprávné heslo'; }
-}
-
-function toggleTheme() {
-  const d = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', d ? 'light' : 'dark');
-  document.getElementById('ti-l').style.display = d ? 'block' : 'none';
-  document.getElementById('ti-d').style.display = d ? 'none' : 'block';
-  localStorage.setItem('ea_theme', d ? 'light' : 'dark');
-}
-
 async function loadEmails() {
   const list = document.getElementById('email-list');
   list.innerHTML = '<div class="loading">Načítám...</div>';
   try {
-    const headers = getAuthHeaders();
-    const res = await fetch('/api/emails', { headers });
-    if (res.status === 401) { await logout(); return; }
+    const res = await fetch('/api/emails', { headers: await getToken() });
+    if (res.status === 401) { logout(); return; }
     const data = await res.json();
     allEmails = Array.isArray(data) ? data : [];
     updateStats();
@@ -480,8 +410,11 @@ async function sendEmail(id) {
   const btn = document.querySelector(`#ecard-${id} .btn-primary`);
   btn.disabled = true; ss.textContent = 'Odesílám...';
   try {
-    const headers = { ...getAuthHeaders(), 'Content-Type': 'application/json' };
-    const res = await fetch('/api/send', { method: 'POST', headers, body: JSON.stringify({ emailId: id, replyText }) });
+    const res = await fetch('/api/send', {
+      method: 'POST',
+      headers: { ...(await getToken()), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emailId: id, replyText }),
+    });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     ss.textContent = 'Odesláno!';
@@ -493,20 +426,24 @@ async function sendEmail(id) {
 }
 
 async function ignoreEmail(id) {
-  const headers = { ...getAuthHeaders(), 'Content-Type': 'application/json' };
-  const res = await fetch('/api/emails', { method: 'PATCH', headers, body: JSON.stringify({ emailId: id, status: 'ignored' }) });
+  const res = await fetch('/api/emails', {
+    method: 'PATCH',
+    headers: { ...(await getToken()), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ emailId: id, status: 'ignored' }),
+  });
   if (!res.ok) return;
   const e = allEmails.find(e => e.id === id); if (e) e.status = 'ignored';
   updateStats(); renderEmails();
 }
-
 
 function initials(f) { const n = String(f || '').split('<')[0].trim(); return n.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?'; }
 function fmtDate(iso) { const d = new Date(iso); const diff = Date.now() - d; if (diff < 3600000) return `před ${Math.floor(diff / 60000)} min`; if (diff < 86400000) return `před ${Math.floor(diff / 3600000)} hod`; return d.toLocaleDateString('cs', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
 function statusLabel(s) { return { pending: 'čeká', sent: 'odesláno', ignored: 'ignorováno' }[s] || s; }
 function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
-setInterval(() => { if (clientPassword) loadEmails(); }, 60000);
+setInterval(() => { if (clerk?.user) loadEmails(); }, 60000);
+
+initClerk();
 </script>
 </body>
 </html>

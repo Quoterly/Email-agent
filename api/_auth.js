@@ -1,9 +1,12 @@
 const { Redis } = require('@upstash/redis');
+const { createClerkClient, verifyToken } = require('@clerk/backend');
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 async function getAuthContext(req) {
   // Admin auth via secret header
@@ -14,7 +17,27 @@ async function getAuthContext(req) {
       : null;
   }
 
-  // Client auth via email + password headers
+  // Clerk Bearer token auth
+  const authHeader = req.headers['authorization'];
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.slice(7);
+    try {
+      const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
+      const user = await clerkClient.users.getUser(payload.sub);
+      const email = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress;
+      if (!email) return null;
+      const ids = (await redis.get('client_index')) || [];
+      for (const id of ids) {
+        const client = await redis.get(`client:${id}`);
+        if (client?.email === email) return { type: 'client', clientId: client.id };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Legacy client password auth (kept for backward compat with admin panel)
   const clientPassword = req.headers['x-client-password'];
   const clientEmail = req.headers['x-client-email'];
   if (clientPassword && clientEmail) {
