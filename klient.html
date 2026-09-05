@@ -109,6 +109,11 @@ input[type=password]:focus,input[type=email]:focus,input[type=text]:focus{border
 </head>
 <body>
 
+<!-- Loading state (visible until Clerk resolves) -->
+<div id="loading-wrap" style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px">
+  Načítám přihlášení…
+</div>
+
 <!-- Clerk sign-in screen -->
 <div class="login-wrap" id="clerk-signin" style="display:none">
   <div id="clerk-signin-mount"></div>
@@ -250,22 +255,28 @@ let clientSettings = {
 const clerkPublishableKey = 'pk_live_Y2xlcmsud2lzZWFnZW50LmN6JA';
 
 async function initClerk() {
-  await new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
-    s.dataset.clerkPublishableKey = clerkPublishableKey;
-    s.crossOrigin = 'anonymous';
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-  clerk = window.Clerk;
-  await clerk.load({ afterSignInUrl: '/klient', afterSignUpUrl: '/klient' });
-  if (clerk.user) {
-    showApp();
-  } else {
-    document.getElementById('clerk-signin').style.display = 'flex';
-    clerk.mountSignIn(document.getElementById('clerk-signin-mount'));
+  const loading = document.getElementById('loading-wrap');
+  try {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
+      s.crossOrigin = 'anonymous';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    clerk = new window.Clerk(clerkPublishableKey);
+    await clerk.load();
+    loading.style.display = 'none';
+    if (clerk.user) {
+      showApp();
+    } else {
+      document.getElementById('clerk-signin').style.display = 'flex';
+      clerk.mountSignIn(document.getElementById('clerk-signin-mount'));
+    }
+  } catch (e) {
+    console.error('Clerk init failed:', e);
+    loading.innerHTML = '<div style="color:var(--danger);font-size:14px;text-align:center">Chyba při načítání přihlášení.<br>Obnovte stránku nebo kontaktujte podporu.</div>';
   }
 }
 
